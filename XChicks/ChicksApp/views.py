@@ -8,10 +8,12 @@ from django.utils import timezone
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import AuthenticationForm
 
+
 # Create your views here.
 #To handle sign up of salesagent user and the manager user
-def index(request):
-    return render(request, 'index.html')
+def indexpage(request):
+    details = request.objects.all().order_by('-id')
+    return render(request, 'index.html',{'details': details})
 
 def signup(request):
     if request.method == 'POST':

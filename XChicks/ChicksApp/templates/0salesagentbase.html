@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales Agent Dashboard - Young4ChickS</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; display: flex; }
+        .sidebar { width: 250px; background-color: #f8f9fa; padding: 20px; height: 100vh; }
+        .navbar-brand img { width: 150px; }
+        .nav { list-style: none; padding: 0; }
+        .nav-item { margin: 10px 0; }
+        .nav-link { text-decoration: none; color: #333; font-size: 16px; display: flex; align-items: center; }
+        .nav-link i { margin-right: 10px; }
+        .logout-btn { background-color: #d32f2f; color: #fff; border: none; padding: 10px 20px; border-radius: 5px; font-weight: 500; width: 100%; margin-top: 20px; cursor: pointer; transition: background-color 0.3s ease; }
+        .content { flex-grow: 1; padding: 20px; }
+        .footer { background-color: #333; color: #fff; text-align: center; padding: 10px; position: fixed; bottom: 0; width: 100%; }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <a class="navbar-brand" href="#">
+            <img src="{% static 'images/logo.png' %}" alt="Young4ChickS Logo">
+        </a>
+        <ul class="nav">
+            <li class="nav-item"><a class="nav-link" href="/"><i class="fas fa-home"></i>Home</a></li>
+            <li class="nav-item"><a class="nav-link" href="/salesagentdashboard/"><i class="fas fa-list"></i>Sales Agent Dash Board</a></li>
+            <li class="nav-item"><a class="nav-link" href="/addrequest/"><i class="fas fa-plus"></i>Add Request</a></li>
+            <li class="nav-item"><a class="nav-link" href="/registerfarmer/"><i class="fas fa-user-plus"></i>Register Farmer</a></li>
+            <li class="nav-item"><a class="nav-link" href="/viewchickrequests/"><i class="fas fa-list"></i>View Chick Requests</a></li>
+            <li class="nav-item"><a class="nav-link" href="/viewfeedrequests/"><i class="fas fa-seedling"></i>View Feed Requests</a></li>
+        </ul>
+        <button class="logout-btn" onclick="window.location.href='/logout/'">Logout</button>
+    </div>
+    <div class="content">
+        <!-- Sales Agent Dashboard Content Placeholder -->
+        <h1>Sales Agent Dashboard</h1>
+        <p>Insert content here (e.g., forms for adding requests, tables for viewing chick/feed requests, or farmer registration details).</p>
+    </div>
+    <div class="footer">
+        <p>&copy; 2025 Young4ChickS. All rights reserved. | Contact: support@young4chicks.com</p>
+    </div>
+</body>
+</html>

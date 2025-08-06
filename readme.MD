@@ -435,3 +435,139 @@ def complete_sale(request, request_id):
     else:
         messages.error(request, 'Request not approved.')
     return redirect('sales_dashboard')
+
+
+   #VIEW FOR INDEX.HTML PAGE
+    def indexpage(request):
+    details = Request.objects.all().order_by('-id')
+    return render(request, 'index.html',{'details': details})
+
+    HTML
+    <main class="container my-5">
+            <div class="card-block" >
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Farmer</th>
+                                <th>Quantity</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr >
+                                <td class="text-xs-center">{{ details.farmer }}</td>
+                                <td class="text-xs-center">{{ details.quantity }}</td>
+                                <td class="text-xs-center">{{ details.date }}</td>
+                                <td class="text-xs-center">{{ details.status }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                </div>
+
+            </div>
+   
+        </main>
+
+
+Manager Dashboard Base Templatehtml
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manager Dashboard - Young4ChickS</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; display: flex; }
+        .sidebar { width: 250px; background-color: #f8f9fa; padding: 20px; height: 100vh; }
+        .navbar-brand img { width: 150px; }
+        .nav { list-style: none; padding: 0; }
+        .nav-item { margin: 10px 0; }
+        .nav-link { text-decoration: none; color: #333; font-size: 16px; display: flex; align-items: center; }
+        .nav-link i { margin-right: 10px; }
+        .logout-btn { background-color: #d32f2f; color: #fff; border: none; padding: 10px 20px; border-radius: 5px; font-weight: 500; width: 100%; margin-top: 20px; cursor: pointer; }
+        .content { flex-grow: 1; padding: 20px; }
+        .footer { background-color: #333; color: #fff; text-align: center; padding: 10px; position: fixed; bottom: 0; width: 100%; }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <a class="navbar-brand" href="#">
+            <img src="{% static 'images/logo.png' %}" alt="Young4ChickS Logo">
+        </a>
+        <ul class="nav">
+            <li class="nav-item"><a class="nav-link" href="/"><i class="fas fa-home"></i>Home</a></li>
+            <li class="nav-item"><a class="nav-link" href="/managersdashboard/"><i class="fas fa-list"></i>Managers Dash Board</a></li>
+            <li class="nav-item"><a class="nav-link" href="/chickrequests/"><i class="fas fa-list"></i>View Chick Requests</a></li>
+            <li class="nav-item"><a class="nav-link" href="/feedrequests/"><i class="fas fa-list"></i>View Feed Requests</a></li>
+            <li class="nav-item"><a class="nav-link" href="/chickStock/"><i class="fas fa-chick"></i>Chick Stock</a></li>
+            <li class="nav-item"><a class="nav-link" href="/feedStock/"><i class="fas fa-seedling"></i>Feed Stock</a></li>
+            <li class="nav-item"><a class="nav-link" href="/farmerrecords/"><i class="fas fa-users"></i>Farmer Records</a></li>
+            <li class="nav-item"><a class="nav-link" href="/sales/"><i class="fas fa-dollar-sign"></i>Sales</a></li>
+            <li class="nav-item"><a class="nav-link" href="/reports/"><i class="fas fa-chart-bar"></i>Reports</a></li>
+        </ul>
+        <button class="logout-btn" onclick="window.location.href='/logout'">Logout</button>
+    </div>
+    <div class="content">
+        <!-- Manager Dashboard Content Placeholder -->
+        <h1>Manager Dashboard</h1>
+        <p>Insert content here (e.g., charts, tables, or reports for chick/feed stock, sales, or farmer records).</p>
+    </div>
+    <div class="footer">
+        <p>&copy; 2025 Young4ChickS. All rights reserved. | Contact: support@young4chicks.com</p>
+    </div>
+</bo
+
+Sales Agent Dashboard Base Templatehtml
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales Agent Dashboard - Young4ChickS</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; display: flex; }
+        .sidebar { width: 250px; background-color: #f8f9fa; padding: 20px; height: 100vh; }
+        .navbar-brand img { width: 150px; }
+        .nav { list-style: none; padding: 0; }
+        .nav-item { margin: 10px 0; }
+        .nav-link { text-decoration: none; color: #333; font-size: 16px; display: flex; align-items: center; }
+        .nav-link i { margin-right: 10px; }
+        .logout-btn { background-color: #d32f2f; color: #fff; border: none; padding: 10px 20px; border-radius: 5px; font-weight: 500; width: 100%; margin-top: 20px; cursor: pointer; transition: background-color 0.3s ease; }
+        .content { flex-grow: 1; padding: 20px; }
+        .footer { background-color: #333; color: #fff; text-align: center; padding: 10px; position: fixed; bottom: 0; width: 100%; }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <a class="navbar-brand" href="#">
+            <img src="{% static 'images/logo.png' %}" alt="Young4ChickS Logo">
+        </a>
+        <ul class="nav">
+            <li class="nav-item"><a class="nav-link" href="/"><i class="fas fa-home"></i>Home</a></li>
+            <li class="nav-item"><a class="nav-link" href="/salesagentdashboard/"><i class="fas fa-list"></i>Sales Agent Dash Board</a></li>
+            <li class="nav-item"><a class="nav-link" href="/addrequest/"><i class="fas fa-plus"></i>Add Request</a></li>
+            <li class="nav-item"><a class="nav-link" href="/registerfarmer/"><i class="fas fa-user-plus"></i>Register Farmer</a></li>
+            <li class="nav-item"><a class="nav-link" href="/viewchickrequests/"><i class="fas fa-list"></i>View Chick Requests</a></li>
+            <li class="nav-item"><a class="nav-link" href="/viewfeedrequests/"><i class="fas fa-seedling"></i>View Feed Requests</a></li>
+        </ul>
+        <button class="logout-btn" onclick="window.location.href='/logout/'">Logout</button>
+    </div>
+    <div class="content">
+        <!-- Sales Agent Dashboard Content Placeholder -->
+        <h1>Sales Agent Dashboard</h1>
+        <p>Insert content here (e.g., forms for adding requests, tables for viewing chick/feed requests, or farmer registration details).</p>
+    </div>
+    <div class="footer">
+        <p>&copy; 2025 Young4ChickS. All rights reserved. | Contact: support@young4chicks.com</p>
+    </div>
+</body>
+</html>
+
+
