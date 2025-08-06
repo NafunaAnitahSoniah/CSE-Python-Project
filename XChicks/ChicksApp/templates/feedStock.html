@@ -1,0 +1,249 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="Description" content="Feed Stock Overview">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Arial', sans-serif;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh; /* Ensure body takes full viewport height */
+            display: flex;
+            flex-direction: column;
+        }
+        .sidebar {
+            width: 250px;
+            background-color: #6a0dad;
+            position: fixed;
+            height: 100%;
+            padding-top: 20px;
+            box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
+            transition: width 0.3s ease;
+        }
+        .sidebar .navbar-brand {
+            padding: 10px 20px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+        .sidebar .navbar-brand img {
+            height: 40px;
+            margin-right: 10px;
+        }
+        .sidebar .nav {
+            flex-direction: column;
+            padding: 0 20px;
+        }
+        .sidebar .nav-link {
+            color: #fff;
+            font-weight: 500;
+            padding: 10px 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            display: flex;
+            align-items: center;
+        }
+        .sidebar .nav-link i {
+            margin-right: 10px;
+        }
+        .sidebar .nav-link:hover {
+            color: #b266ff;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        .main-content {
+            margin-left: 250px;
+            width: calc(100% - 250px);
+            padding: 20px;
+            transition: margin-left 0.3s ease;
+            flex: 1 0 auto; /* Allow main content to grow but not shrink below content height */
+        }
+        .container {
+            max-width: 1200px;
+            margin-top: 20px;
+        }
+        .update-btn {
+            background-color: #2e7d32;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-weight: 500;
+            margin-bottom: 20px;
+            transition: background-color 0.3s ease;
+        }
+        .update-btn:hover {
+            background-color: #1b5e20;
+        }
+        .table-card {
+            background: #fff;
+            border: 1px solid #b266ff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+        .table-card h2 {
+            color: #6a0dad;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #b266ff;
+        }
+        th {
+            background-color: #6a0dad;
+            color: #fff;
+        }
+        tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        tr:hover {
+            background-color: #e0e0e0;
+        }
+        footer {
+            background-color: #68b86c;
+            color: #fff;
+            padding: 20px 0;
+            text-align: center;
+            width: 100%;
+            flex-shrink: 0; /* Prevent footer from shrinking */
+        }
+        footer .container {
+            max-width: 1200px;
+        }
+        footer .row {
+            margin: 0;
+        }
+        footer h5 {
+            color: #66bb6a;
+        }
+        footer hr {
+            border-color: #b266ff;
+            margin: 20px 0;
+        }
+        footer p {
+            color: #6a0dad;
+        }
+        @media (max-width: 768px) {
+            .sidebar { width: 200px; }
+            .main-content { margin-left: 200px; width: calc(100% - 200px); }
+            .container { padding: 10px; }
+        }
+        @media (max-width: 576px) {
+            .sidebar { width: 100%; height: auto; position: relative; }
+            .main-content { margin-left: 0; width: 100%; }
+            .sidebar .nav-link { display: inline-block; margin-right: 10px; margin-bottom: 5px; }
+            table, thead, tbody, th, td, tr {
+                display: block;
+            }
+            th {
+                position: absolute;
+                top: -9999px;
+                left: -9999px;
+            }
+            td {
+                position: relative;
+                padding-left: 50%;
+            }
+            td:before {
+                position: absolute;
+                left: 10px;
+                white-space: nowrap;
+                content: attr(data-label);
+                font-weight: bold;
+                color: #6a0dad;
+            }
+        }
+    </style>
+    <title>Feed Stock</title>
+</head>
+<body>
+    <div class="sidebar">
+        <a class="navbar-brand" href="#">
+            <img src="{% static 'images/logo.png' %}" alt="Young4ChickS Logo">
+        </a>
+        <ul class="nav">
+            <li class="nav-item"><a class="nav-link" href="/"><i class="fas fa-home"></i>Home</a></li>
+            <li class="nav-item"><a class="nav-link" href="/managersdashboard/"><i class="fas fa-list"></i>Managers Dash Board</a></li>
+            <li class="nav-item"><a class="nav-link" href="/chickrequests/"><i class="fas fa-list"></i>View Chick Requests</a></li>
+            <li class="nav-item"><a class="nav-link" href="/feedrequests/"><i class="fas fa-list"></i> View Feed Requests</a></li>
+            <li class="nav-item"><a class="nav-link" href="/chickStock/"><i class="fas fa-chick"></i>Chick Stock</a></li>
+            <li class="nav-item"><a class="nav-link" href="/feedStock/"><i class="fas fa-seedling"></i>Feed Stock</a></li>
+            <li class="nav-item"><a class="nav-link" href="/farmerRecords/"><i class="fas fa-users"></i>Farmer Records</a></li>
+            <li class="nav-item"><a class="nav-link" href="/sales/"><i class="fas fa-dollar-sign"></i>Sales</a></li>
+            <li class="nav-item"><a class="nav-link" href="/reports/"><i class="fas fa-chart-bar"></i>Reports</a></li>
+        </ul>
+        <button class="logout-btn" onclick="window.location.href='/logout/'" style="background-color: #d32f2f; color: #fff; border: none; padding: 10px 20px; border-radius: 5px; font-weight: 500; width: 100%; margin-top: 20px; transition: background-color 0.3s ease;">
+            Logout
+        </button>
+    </div>
+    <div class="main-content">
+        <div class="container">
+            <a href="/updatefeedstock/1/" class="update-btn">Update Feed Stock</a> <!-- Adjust pk as needed -->
+            <div class="table-card">
+                <h2>Feed Stock Overview</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Stock Name</th>
+                            <th>Feed Name</th>
+                            <th>Feed Type</th>
+                            <th>Feed Brand</th>
+                            <th>Quantity</th>
+                            <th>Expiry Date</th>
+                            <th>Purchase Price (UgSh)</th>
+                            <th>Selling Price (UgSh)</th>
+                            <th>Supplier</th>
+                            <th>Supplier Contact</th>
+                            <th>Updated At</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for stock in feed_stocks %}
+                        <tr>
+                            <td data-label="Stock Name">{{ stock.stock_name }}</td>
+                            <td data-label="Feed Name">{{ stock.feed_name }}</td>
+                            <td data-label="Feed Type">{{ stock.feed_type }}</td>
+                            <td data-label="Feed Brand">{{ stock.feed_brand }}</td>
+                            <td data-label="Quantity">{{ stock.feed_quantity }}</td>
+                            <td data-label="Expiry Date">{{ stock.expiry_date|date:'Y-m-d' }}</td>
+                            <td data-label="Purchase Price (KSh)">{{ stock.purchase_price }}</td>
+                            <td data-label="Selling Price (KSh)">{{ stock.selling_price }}</td>
+                            <td data-label="Supplier">{{ stock.supplier }}</td>
+                            <td data-label="Supplier Contact">{{ stock.supplier_contact }}</td>
+                            <td data-label="Updated At">{{ stock.updated_at|date:'Y-m-d H:i' }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="11">No feed stock available.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <footer>
+        <div class="container">            
+            <hr>
+            <p>&copy; 2025 Young4ChickS. All rights reserved. | Designed by Nafuna Anitah Soniah</p>
+        </div>
+    </footer>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.9.2/umd/popper.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.min.js"></script>
+</body>
+</html>

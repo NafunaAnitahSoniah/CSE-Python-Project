@@ -1,0 +1,190 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Young4ChickS</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS with purple and green theme -->
+    <style>
+        body {
+            background-color: #f8f9fa; /* Light gray background */
+            font-family: 'Arial', sans-serif;
+            color: #333;
+        }
+        .navbar {
+            background-color: #6a0dad; /* Deep purple */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .navbar-brand img {
+            height: 40px;
+        }
+        .nav-link {
+            color: #fff; /* White text for contrast */
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        .nav-link:hover {
+            color: #b266ff; /* Light purple hover */
+        }
+        .container-fluid {
+            max-width: 1200px;
+        }
+        .content-container {
+            margin-top: 80px;
+        }
+        /* Masonry-style grid using CSS columns */
+        .masonry-grid {
+            column-count: 3;
+            column-gap: 20px;
+            padding: 20px;
+        }
+        .masonry-item {
+            display: inline-block;
+            width: 100%;
+            margin-bottom: 20px;
+            background: #fff;
+            border: 1px solid #b266ff; /* Light purple border */
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        .masonry-item:hover {
+            transform: translateY(-5px);
+        }
+        .masonry-item img {
+            width: 100%;
+            height: auto;
+            border-radius: 10px 10px 0 0;
+        }
+        .masonry-item-content {
+            padding: 15px;
+        }
+        .btn-primary {
+            background-color: #2e7d32; /* Deep green */
+            border-color: #2e7d32;
+        }
+        .btn-primary:hover {
+            background-color: #1b5e20; /* Darker green */
+            border-color: #1b5e20;
+        }
+        .alert-success {
+            background-color: #66bb6a; /* Light green for success */
+            color: #fff;
+            border: none;
+        }
+        .alert-danger {
+            background-color: #6a0dad; /* Deep purple for errors */
+            color: #fff;
+            border: none;
+        }
+        .alert {
+            border-radius: 10px;
+        }
+        /* Form styling */
+        .form-control, .form-select {
+            border-color: #b266ff; /* Light purple border */
+            border-radius: 8px;
+        }
+        .form-label {
+            font-weight: 500;
+            color: #6a0dad; /* Deep purple for labels */
+        }
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .masonry-grid {
+                column-count: 2;
+            }
+        }
+        @media (max-width: 576px) {
+            .masonry-grid {
+                column-count: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{% url 'home' %}">
+                <img src="{% static 'images/logo.png' %}" alt="Young4ChickS Logo">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    {% if user.is_authenticated %}
+                        {% if user.role == 'farmer' %}
+                            <li class="nav-item"><a class="nav-link" href="{% url 'farmer_dashboard' %}">Dashboard</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{% url 'submit_request' %}">Submit Request</a></li>
+                        {% elif user.role == 'manager' %}
+                            <li class="nav-item"><a class="nav-link" href="{% url 'manager_dashboard' %}">Dashboard</a></li>
+                        {% elif user.role == 'sales_agent' %}
+                            <li class="nav-item"><a class="nav-link" href="{% url 'sales_dashboard' %}">Dashboard</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{% url 'submit_request' %}">Submit Request</a></li>
+                        {% endif %}
+                        <li class="nav-item"><a class="nav-link" href="{% url 'logout' %}">Logout</a></li>
+                    {% else %}
+                        <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Login</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'register_farmer' %}">Register</a></li>
+                    {% endif %}
+                    <!-- Social Icon -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="https://twitter.com/young4chicks" target="_blank">
+                            <img src="{% static 'images/twitter-icon.png' %}" alt="Twitter" style="height: 20px;">
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container-fluid content-container">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+        {% block content %}
+        {% endblock %}
+    </div>
+
+    <!-- Bootstrap 5 JS (required for navbar toggle) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+
+
+<footer style="background-color: #68b86c; color: #fff; padding: 20px 0; text-align: center; position: relative; bottom: 0; width: 100%;">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 col-md-4">
+                <h5 style="color: #66bb6a;">About Us</h5>
+                <p>Young4ChickS is dedicated to empowering young farmers with quality chicks and feeds. Join us in building a sustainable future!</p>
+            </div>
+            <div class="col-12 col-md-4">
+                <h5 style="color: #66bb6a;">Contact</h5>
+                <p>Email: info@young4chicks.com</p>
+                <p>Phone: +254 712 345 678</p>
+                <p>Address: Nairobi, Kenya</p>
+            </div>
+            <div class="col-12 col-md-4">
+                <h5 style="color: #66bb6a;">Follow Us</h5>
+                <a href="https://x.com/young4chicks" target="_blank" style="color: #b266ff; margin: 0 10px; text-decoration: none;">X</a>
+                <a href="https://facebook.com/young4chicks" target="_blank" style="color: #b266ff; margin: 0 10px; text-decoration: none;">Facebook</a>
+                <a href="https://instagram.com/young4chicks" target="_blank" style="color: #b266ff; margin: 0 10px; text-decoration: none;">Instagram</a>
+            </div>
+        </div>
+        <hr style="border-color: #b266ff; margin: 20px 0;">
+        <p style="color: #6a0dad;">&copy; 2025 Young4ChickS. All rights reserved. | Designed by Nafuna Anitah Soniah </p>
+    </div>
+</footer>
+</html>

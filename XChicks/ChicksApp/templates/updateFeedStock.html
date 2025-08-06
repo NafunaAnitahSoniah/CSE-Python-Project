@@ -1,0 +1,264 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="Description" content="Update Feed Stock">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Arial', sans-serif;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: #6a0dad;
+            position: fixed;
+            height: 100%;
+            padding-top: 20px;
+            box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
+            transition: width 0.3s ease;
+        }
+
+        .sidebar .navbar-brand {
+            padding: 10px 20px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .sidebar .navbar-brand img {
+            height: 40px;
+            margin-right: 10px;
+        }
+
+        .sidebar .nav {
+            flex-direction: column;
+            padding: 0 20px;
+        }
+
+        .sidebar .nav-link {
+            color: #fff;
+            font-weight: 500;
+            padding: 10px 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            display: flex;
+            align-items: center;
+        }
+
+        .sidebar .nav-link i {
+            margin-right: 10px;
+        }
+
+        .sidebar .nav-link:hover {
+            color: #b266ff;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .main-content {
+            margin-left: 250px;
+            width: calc(100% - 250px);
+            padding: 20px;
+            transition: margin-left 0.3s ease;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin-top: 20px;
+        }
+
+        .back-btn {
+            background-color: #2e7d32;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-weight: 500;
+            margin-bottom: 20px;
+            transition: background-color 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background-color: #1b5e20;
+        }
+
+        .form-card {
+            background: #fff;
+            border: 1px solid #b266ff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+
+        .form-card h2 {
+            color: #6a0dad;
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            color: #6a0dad;
+            font-weight: 500;
+        }
+
+        .form-control {
+            border-color: #b266ff;
+            border-radius: 5px;
+        }
+
+        .form-control:focus {
+            border-color: #6a0dad;
+            box-shadow: 0 0 5px rgba(106, 13, 173, 0.5);
+        }
+
+        .submit-btn {
+            background-color: #2e7d32;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-weight: 500;
+            transition: background-color 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            background-color: #1b5e20;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 200px;
+            }
+
+            .main-content {
+                margin-left: 200px;
+                width: calc(100% - 200px);
+            }
+
+            .container {
+                padding: 10px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+            }
+
+            .sidebar .nav-link {
+                display: inline-block;
+                margin-right: 10px;
+                margin-bottom: 5px;
+            }
+        }
+    </style>
+    <title>Update Feed Stock</title>
+</head>
+
+<body>
+    <div class="sidebar">
+        <a class="navbar-brand" href="#">
+            <img src="{% static 'images/logo.png' %}" alt="Young4ChickS Logo">
+        </a>
+        <ul class="nav">
+            <li class="nav-item"><a class="nav-link" href="/"><i class="fas fa-home"></i>Home</a></li>
+            <li class="nav-item"><a class="nav-link" href="/managersdashboard/"><i class="fas fa-list"></i>Managers Dash Board</a></li>
+            <li class="nav-item"><a class="nav-link" href="/chickrequests/"><i class="fas fa-list"></i>View Chick Requests</a></li>
+            <li class="nav-item"><a class="nav-link" href="/feedrequests/"><i class="fas fa-list"></i> View Feed Requests</a></li>
+            <li class="nav-item"><a class="nav-link" href="/chickStock/"><i class="fas fa-chick"></i>Chick Stock</a>
+            </li>
+            <li class="nav-item"><a class="nav-link" href="/feedStock/"><i class="fas fa-seedling"></i>Feed Stock</a>
+            </li>
+            <li class="nav-item"><a class="nav-link" href="/farmerRecords/"><i class="fas fa-users"></i>Farmer
+                    Records</a></li>
+            <li class="nav-item"><a class="nav-link" href="/sales/"><i class="fas fa-dollar-sign"></i>Sales</a></li>
+            <li class="nav-item"><a class="nav-link" href="/reports/"><i class="fas fa-chart-bar"></i>Reports</a></li>
+        </ul>
+        <button class="logout-btn" onclick="window.location.href='/logout/'">Logout</button>
+    </div>
+    <div class="main-content">
+        <div class="container">
+            <a href="/updatefeedstock/" class="back-btn">Back to Feed Stock</a>
+            <div class="form-card">
+                <h2>Update Feed Stock</h2>
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="form-group mb-3">
+                        <label for="stock_name">Stock Name</label>
+                        <input type="text" class="form-control" id="stock_name" name="stock_name"
+                            value="{{ feedstock.stock_name }}" required>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="feed_name">Feed Name</label>
+                        <input type="text" class="form-control" id="feed_name" name="feed_name"
+                            value="{{ feedstock.feed_name }}" required>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="feed_type">Feed Type</label>
+                        <input type="text" class="form-control" id="feed_type" name="feed_type"
+                            value="{{ feedstock.feed_type }}" required>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="feed_brand">Feed Brand</label>
+                        <input type="text" class="form-control" id="feed_brand" name="feed_brand"
+                            value="{{ feedstock.feed_brand }}" required>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="feed_quantity">Feed Quantity</label>
+                        <input type="number" class="form-control" id="feed_quantity" name="feed_quantity"
+                            value="{{ feedstock.feed_quantity }}" min="0" required>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="expiry_date">Expiry Date</label>
+                        <input type="date" class="form-control" id="expiry_date" name="expiry_date"
+                            value="{{ feedstock.expiry_date|date:'Y-m-d' }}" required>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="purchase_price">Purchase Price (KSh)</label>
+                        <input type="number" class="form-control" id="purchase_price" name="purchase_price"
+                            value="{{ feedstock.purchase_price }}" min="0" required>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="selling_price">Selling Price (KSh)</label>
+                        <input type="number" class="form-control" id="selling_price" name="selling_price"
+                            value="{{ feedstock.selling_price }}" min="0" required>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="supplier">Supplier</label>
+                        <input type="text" class="form-control" id="supplier" name="supplier"
+                            value="{{ feedstock.supplier }}" required>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="supplier_contact">Supplier Contact</label>
+                        <input type="text" class="form-control" id="supplier_contact" name="supplier_contact"
+                            value="{{ feedstock.supplier_contact }}" required>
+                    </div>
+                    <button type="submit" class="submit-btn">Update Feed Stock</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.9.2/umd/popper.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.min.js"></script>
+</body>
+
+</html>

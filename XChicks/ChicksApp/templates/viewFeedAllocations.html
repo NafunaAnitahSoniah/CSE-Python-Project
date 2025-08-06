@@ -1,0 +1,291 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="Description" content="Feed Allocations Overview">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Arial', sans-serif;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: #6a0dad;
+            position: fixed;
+            height: 100%;
+            padding-top: 20px;
+            box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
+            transition: width 0.3s ease;
+        }
+
+        .sidebar .navbar-brand {
+            padding: 10px 20px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .sidebar .navbar-brand img {
+            height: 40px;
+            margin-right: 10px;
+        }
+
+        .sidebar .nav {
+            flex-direction: column;
+            padding: 0 20px;
+        }
+
+        .sidebar .nav-link {
+            color: #fff;
+            font-weight: 500;
+            padding: 10px 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            display: flex;
+            align-items: center;
+        }
+
+        .sidebar .nav-link i {
+            margin-right: 10px;
+        }
+
+        .sidebar .nav-link:hover {
+            color: #b266ff;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .main-content {
+            margin-left: 250px;
+            width: calc(100% - 250px);
+            padding: 20px;
+            transition: margin-left 0.3s ease;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin-top: 20px;
+        }
+
+        .table-card {
+            background: #fff;
+            border: 1px solid #b266ff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+
+        .table-card h2 {
+            color: #6a0dad;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #b266ff;
+        }
+
+        th {
+            background-color: #6a0dad;
+            color: #fff;
+        }
+
+        tr {
+            transition: background-color 0.3s ease;
+        }
+
+        tr.paid {
+            background-color: #bdbdbd;
+        }
+
+        /* Grey for paid */
+        tr.pending {
+            background-color: #ff9800;
+        }
+
+        /* Orange for pending */
+        tr:hover {
+            background-color: #e0e0e0 !important;
+            color: #333;
+        }
+
+        .action-btn {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            font-weight: 500;
+            background-color: #2e7d32;
+            color: #fff;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .action-btn:hover {
+            background-color: #1b5e20;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 200px;
+            }
+
+            .main-content {
+                margin-left: 200px;
+                width: calc(100% - 200px);
+            }
+
+            .container {
+                padding: 10px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+            }
+
+            .sidebar .nav-link {
+                display: inline-block;
+                margin-right: 10px;
+                margin-bottom: 5px;
+            }
+
+            table,
+            thead,
+            tbody,
+            th,
+            td,
+            tr {
+                display: block;
+            }
+
+            th {
+                position: absolute;
+                top: -9999px;
+                left: -9999px;
+            }
+
+            td {
+                position: relative;
+                padding-left: 50%;
+            }
+
+            td:before {
+                position: absolute;
+                left: 10px;
+                white-space: nowrap;
+                content: attr(data-label);
+                font-weight: bold;
+                color: #6a0dad;
+            }
+
+            .action-btn {
+                display: block;
+                margin: 5px 0;
+                width: 100%;
+            }
+        }
+    </style>
+    <title>Feed Allocations</title>
+</head>
+
+<body>
+    <div class="sidebar">
+        <a class="navbar-brand" href="#">
+            <img src="{% static 'images/logo.png' %}" alt="Young4ChickS Logo">
+        </a>
+        <ul class="nav">
+            <li class="nav-item"><a class="nav-link" href="/"><i class="fas fa-home"></i>Home</a></li>
+            <li class="nav-item"><a class="nav-link" href="/managersdashboard/"><i class="fas fa-list"></i>Managers Dash Board</a></li>
+            <li class="nav-item"><a class="nav-link" href="/chickrequests/"><i class="fas fa-list"></i> View Chick Requests</a>
+            </li>
+            <li class="nav-item"><a class="nav-link" href="/feedrequests/"><i class="fas fa-list"></i> View Feed Requests</a></li>
+            <li class="nav-item"><a class="nav-link" href="/chickstock/"><i class="fas fa-chick"></i> Update Chick
+                    Stock</a></li>
+            <li class="nav-item"><a class="nav-link" href="/feedStock/"><i class="fas fa-seedling"></i> Update Feed
+                    Stock</a></li>
+            <li class="nav-item"><a class="nav-link" href="/farmerRecords/"><i class="fas fa-users"></i> Farmer
+                    Records</a></li>
+            <li class="nav-item"><a class="nav-link" href="/sales/"><i class="fas fa-dollar-sign"></i> Sales</a></li>
+            <li class="nav-item"><a class="nav-link" href="/reports/"><i class="fas fa-chart-bar"></i> Reports</a></li>
+        </ul>
+        <button class="logout-btn" onclick="window.location.href='/logout/'">Logout</button>
+    </div>
+    <div class="main-content">
+        <div class="container">
+            <div class="table-card">
+                <h2>Feed Allocations Overview</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Feed Request ID</th>
+                            <th>Feed Name</th>
+                            <th>Feed Type</th>
+                            <th>Feed Brand</th>
+                            <th>Chick Request ID</th>
+                            <th>Bags Allocated</th>
+                            <th>Amount Due (KSh)</th>
+                            <th>Payment Due Date</th>
+                            <th>Payment Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for allocation in feed_allocations %}
+                        <tr class="{{ allocation.payment_status|lower }}">
+                            <td data-label="Feed Request ID">{{ allocation.feed_request_id }}</td>
+                            <td data-label="Feed Name">{{ allocation.feed_name }}</td>
+                            <td data-label="Feed Type">{{ allocation.feed_type }}</td>
+                            <td data-label="Feed Brand">{{ allocation.feed_brand }}</td>
+                            <td data-label="Chick Request ID">{{ allocation.chick_request.chick_request_id }}</td>
+                            <td data-label="Bags Allocated">{{ allocation.bags_allocated }}</td>
+                            <td data-label="Amount Due (KSh)">{{ allocation.amount_due }}</td>
+                            <td data-label="Payment Due Date">{{ allocation.payment_due_date|date:'Y-m-d' }}</td>
+                            <td data-label="Payment Status">{{ allocation.payment_status }}</td>
+                            <td data-label="Actions">
+                                <a href="/reviewfarmer/{{ allocation.chick_request.farmer.id }}/"
+                                    class="action-btn">View Farmer</a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="10">No feed allocations available.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.9.2/umd/popper.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.min.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,125 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="Description" content="Enter your description here"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+    
+    <style>
+        body {
+            background-color: #f8f9fa; /* Light gray background */
+            font-family: 'Arial', sans-serif;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin-top: 80px;
+            padding: 20px;
+        }
+        .form-container {
+            background: #fff;
+            border: 1px solid #b266ff; /* Light purple border */
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 30px; /* Increased padding for better spacing */
+            transition: transform 0.3s ease;
+        }
+        .form-container:hover {
+            transform: translateY(-5px);
+        }
+        .form-table {
+            width: 100%;
+            border-collapse: separate; /* Ensure spacing between rows */
+            border-spacing: 0 15px; /* Vertical spacing between rows */
+        }
+        .form-table td {
+            padding: 10px 15px; /* Horizontal and vertical padding for cells */
+            vertical-align: top; /* Align labels and inputs at the top */
+        }
+        .form-table label {
+            font-weight: 500;
+            color: #6a0dad; /* Deep purple */
+            display: block; /* Ensure labels take full width */
+            margin-bottom: 5px; /* Space between label and input */
+            font-size: 1.1rem; /* Slightly larger font for readability */
+        }
+        .form-control {
+            border-color: #b266ff; /* Light purple border */
+            border-radius: 8px;
+            padding: 10px; /* Increased padding for inputs */
+            width: 100%; /* Full width for better alignment */
+            box-sizing: border-box; /* Include padding in width calculation */
+        }
+        .btn-primary {
+            background-color: #2e7d32; /* Deep green */
+            border-color: #2e7d32;
+            width: 100%;
+            padding: 12px; /* Increased padding for button */
+            font-weight: 500;
+            font-size: 1.1rem; /* Larger text for button */
+        }
+        .btn-primary:hover {
+            background-color: #1b5e20; /* Darker green */
+            border-color: #1b5e20;
+        }
+        .errorlist {
+            color: #6a0dad; /* Deep purple for errors */
+            list-style: none;
+            padding-left: 0;
+            margin-top: 5px; /* Space above error list */
+        }
+        .errorlist li {
+            background-color: #f8d7da; /* Light red background */
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.9rem; /* Smaller error text */
+        }
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .container {
+                margin-top: 40px;
+                padding: 10px;
+            }
+            .form-container {
+                padding: 20px; /* Reduced padding on mobile */
+            }
+            .form-table td {
+                padding: 5px 10px; /* Reduced padding on mobile */
+                display: block; /* Stack labels and inputs on mobile */
+            }
+            .form-table label {
+                margin-bottom: 3px; /* Reduced spacing on mobile */
+            }
+            .form-control {
+                padding: 8px; /* Reduced input padding on mobile */
+            }
+            .btn-primary {
+                padding: 10px; /* Reduced button padding on mobile */
+            }
+        }
+    </style>
+    <title>Sign Up</title>
+</head>
+<body>
+    {% block content %}
+    <div class="container">
+        <div class="form-container">
+            <form action="" method="post">
+                {% csrf_token %}
+                {{ form_data.as_table }}  
+                <button type="submit" class="btn btn-primary">
+                    Sign up
+                </button>
+            </form>
+        </div>
+    </div>
+    {% endblock %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.9.2/umd/popper.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.min.js"></script>
+</body>
+</html>
