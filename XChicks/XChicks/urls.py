@@ -21,9 +21,29 @@ from ChicksApp import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', views.index, name='index'),
+    path('', views.indexpage, name='index'),
     path('signup/', views.signup, name='signup'),
     path('login/', views.Login, name='Login'),
-    path('managersdashboard/', views.Managersdashboard, name='Managersdashboard'),
     path('logout/', views.Logout, name='Logout'),
+
+    #for the managers dashboard
+    path('managersdashboard/', views.Managersdashboard, name='Managersdashboard'),
+    path('chickrequests/', views.ViewChickRequests, name='Viewchickrequests'),
+    path('feedrequests/', views.ViewFeedRequests, name='Viewfeedrequests'),
+    path('farmerreview/', views.FarmerReview, name='Farmerreview'),
+    path('farmerrecords/', views.FarmerRecords, name='Farmerrecords'),
+    path('chickstock/', views.chickStock, name='Chickstock'),
+    path('feedstock/', views.feedStock, name='Feedstock'),
+    path('updatechickstock/', views.UpdateChickStock, name='Updatechickstock'),
+    path('updatefeedstock/', views.UpdateFeedStock, name='Updatefeedstock'),
+    path('reports/', views.Reports, name='Reports'),
+    path('sales/', views.Sales, name='Sales'),
+
+    #sales agent dashboard
+    path('salesagentdashboard/', views.SalesAgentdashboard, name='salesagentdashboard'),
+    path('addchickrequest/', views.AddChickRequest, name='addchickrequest'),
+    path('addfeedrequest/', views.AddFeedRequest, name='addfeedrequest'),
+    path('registerfarmer/', views.RegisterFarmer, name='registerfarmer'),
+    path('salesagentchickrequests/', views.ViewSalesAgentChickRequests, name='salesagentchickrequests'),
+    path('salesagentfeedrequests/', views.ViewSalesAgentFeedRequests, name='salesagentfeedrequests'),
 ]

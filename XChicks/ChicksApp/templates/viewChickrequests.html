@@ -246,9 +246,9 @@
             <li class="nav-item"><a class="nav-link" href="/managersdashboard/"><i class="fas fa-list"></i>Managers Dash Board</a></li>
             <li class="nav-item"><a class="nav-link" href="/chickrequests/"><i class="fas fa-list"></i> View Chick Requests</a></li>
             <li class="nav-item"><a class="nav-link" href="/feedrequests/"><i class="fas fa-list"></i> View Feed Requests</a></li>
-            <li class="nav-item"><a class="nav-link" href="/chickStock/"><i class="fas fa-chick"></i> Chick Stock</a></li>
-            <li class="nav-item"><a class="nav-link" href="/feedStock/"><i class="fas fa-seedling"></i>Feed Stock</a></li>
-            <li class="nav-item"><a class="nav-link" href="/farmerRecords/"><i class="fas fa-users"></i>Farmer Records</a></li>
+            <li class="nav-item"><a class="nav-link" href="/chickstock/"><i class="fas fa-chick"></i> Chick Stock</a></li>
+            <li class="nav-item"><a class="nav-link" href="/feedstock/"><i class="fas fa-seedling"></i>Feed Stock</a></li>
+            <li class="nav-item"><a class="nav-link" href="/farmerrecords/"><i class="fas fa-users"></i>Farmer Records</a></li>
             <li class="nav-item"><a class="nav-link" href="/sales/"><i class="fas fa-dollar-sign"></i>Sales</a></li>
             <li class="nav-item"><a class="nav-link" href="/reports/"><i class="fas fa-chart-bar"></i>Reports</a></li>
         </ul>
@@ -298,7 +298,7 @@
                             <td data-label="Approved On">{{ request.approved_on|date:'Y-m-d H:i'|default:"N/A" }}</td>
                             <td data-label="Delivered">{{ request.delivered|yesno:"Yes,No" }}</td>
                             <td data-label="Actions">
-                                <a href="/reviewfarmer/{{ request.id }}/" class="action-btn view-btn">View Farmer</a>
+                                <a href="/farmerreview/" class="action-btn view-btn">View Farmer</a>
                                 <a href="/deleterequest/{{ request.id }}/" class="action-btn delete-btn">Delete
                                     Request</a>
                             </td>

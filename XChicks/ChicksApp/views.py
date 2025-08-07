@@ -56,14 +56,88 @@ def Login(request):
     return render(request, 'login.html', {'form':form, 'title':'login'})
 
 
+#For the Managers
 
 def Managersdashboard(request):
     
     return render(request, 'managersdashboard.html' )
 
+def ViewChickRequests(request):
+
+    return render(request, 'viewChickrequests.html')
+
+def ViewFeedRequests(request):
+
+    return render(request, 'viewFeedAllocations.html')
+
+def FarmerReview(request):
+     return render(request, 'farmerReview.html')
+
+def Approverequest(request):
+    return render(request, 'approveRequest.html')
+
+
+def FarmerRecords(request):
+     return render(request, 'farmerRecords.html')
+
+def chickStock(request):
+    return render(request, 'chickStock.html')
+
+def feedStock(request):
+    return render(request, 'feedStock.html')
+
+def UpdateChickStock(request):
+
+    return render(request, 'updateChickStock.html')
+
+def UpdateFeedStock(request):
+
+    return render(request, 'updateFeedStock.html')
+
+def Reports(request):
+
+    return render(request, 'reports.html')
+
+def Sales(request):
+
+    return render(request, 'sales.html')
+
+
+
+def DeleteRequest(request):
+     return render(request, 'deleteRequest.html')
+
+
+
+
+#For the Sales Agents
+def SalesAgentdashboard(request):
+    return render(request, '1salesAgentdashboard.html')
+
+def AddChickRequest(request):
+    return render(request, '1addChickRequests.html')
+
+def AddFeedRequest(request):
+    return render(request, '1addFeedRequest.html')
+
+def RegisterFarmer(request):
+    return render(request, '1registerfarmer.html')
+
+def AddChickRequest(request):
+    return render(request, '1addChickRequests.html') 
+
+def AddFeedRequest(request):
+    return render(request, '1addFeedRequest.html')
+
+def ViewSalesAgentChickRequests(request):
+    return render(request, '1viewchickrequests.html')
+
+def ViewSalesAgentFeedRequests(request):
+    return render(request, '1viewfeedrequests.html')
+
+
 def Logout(request):
     logout(request)
-
     return redirect('/')
    
 
