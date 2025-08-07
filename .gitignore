@@ -2,5 +2,6 @@ djenv/
 XChicks/db.sqlite3
 static/
 XChicks/db.sqlite3
-XChicks/db.sqlite3
+XChicks/ChicksApp/__pycache__/*
+
  
