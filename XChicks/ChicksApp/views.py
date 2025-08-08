@@ -114,8 +114,54 @@ def DeleteRequest(request):
 def SalesAgentdashboard(request):
     return render(request, '1salesAgentdashboard.html')
 
+@login_required
 def AddChickRequest(request):
-    return render(request, '1addChickRequests.html')
+        if request.method == 'POST':
+            # Extract form data
+            farmer_id = request.POST.get('farmer')
+            chick_request_id = request.POST.get('chick_request_id')
+            farmer_type = request.POST.get('farmer_type')
+            chick_type = request.POST.get('chick_type')
+            chick_breed = request.POST.get('chick_breed')
+            quantity = request.POST.get('quantity')
+            chick_period = request.POST.get('chick_period')
+            # Convert feed_taken to boolean
+            feed_taken = request.POST.get('feed_taken') == 'True'  
+            payment_terms = request.POST.get('payment_terms')
+            received_through = request.POST.get('received_through')
+
+            # Get the farmer instance
+            farmer = get_object_or_404(Customer, id=farmer_id)
+
+            # Create a new ChickRequest instance
+            chick_request = ChickRequest(
+                farmer=farmer,
+                chick_request_id=chick_request_id,
+                farmer_type=farmer_type,
+                chick_type=chick_type,
+                chick_breed=chick_breed,
+                quantity=quantity,
+                chick_period=chick_period,
+                feed_taken=feed_taken,
+                payment_terms=payment_terms,
+                received_through=received_through,
+                # Assuming the logged-in user is the creator
+                created_by=request.user  
+            )
+
+            try:
+                # Validate and save the instance
+                chick_request.full_clean()  # Runs the clean method including custom validations
+                chick_request.save()
+                messages.success(request, 'Chick request submitted successfully!')
+                return redirect('salesagentdashboard')  # Redirect to dashboard after success
+            except ValidationError as e:
+                messages.error(request, '\n'.join(e.messages))  # Display validation errors
+                return redirect('add_chick_request')
+
+    # GET request: Render the form with farmer options
+        farmers = Customer.objects.all()  # Fetch all farmers for the dropdown
+        return render(request, '1addChickRequests.html', {'farmers': farmers})
 
 def AddFeedRequest(request):
     return render(request, '1addFeedRequest.html')

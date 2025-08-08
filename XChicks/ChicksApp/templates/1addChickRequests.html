@@ -1,6 +1,7 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -16,33 +17,40 @@
             color: #333;
             margin: 0;
             padding: 0;
-            min-height: 100vh; /* Ensure body takes full viewport height */
+            min-height: 100vh;
+            /* Ensure body takes full viewport height */
             display: flex;
             flex-direction: column;
         }
+
         .sidebar {
             width: 250px;
-            background-color: #338d39; /* Green as major color */
+            background-color: #338d39;
+            /* Green as major color */
             position: fixed;
             height: 100%;
             padding-top: 20px;
             box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
             transition: width 0.3s ease;
         }
+
         .sidebar .navbar-brand {
             padding: 10px 20px;
             margin-bottom: 20px;
             display: flex;
             align-items: center;
         }
+
         .sidebar .navbar-brand img {
             height: 40px;
             margin-right: 10px;
         }
+
         .sidebar .nav {
             flex-direction: column;
             padding: 0 20px;
         }
+
         .sidebar .nav-link {
             color: #fff;
             font-weight: 500;
@@ -53,24 +61,31 @@
             display: flex;
             align-items: center;
         }
+
         .sidebar .nav-link i {
             margin-right: 10px;
         }
+
         .sidebar .nav-link:hover {
-            color: #66bb6a; /* Lighter green for hover */
+            color: #66bb6a;
+            /* Lighter green for hover */
             background-color: rgba(255, 255, 255, 0.1);
         }
+
         .main-content {
             margin-left: 250px;
             width: calc(100% - 250px);
             padding: 20px;
-            flex: 1 0 auto; /* Allow main content to grow but not shrink below content height */
+            flex: 1 0 auto;
+            /* Allow main content to grow but not shrink below content height */
             transition: margin-left 0.3s ease;
         }
+
         .container {
             max-width: 1200px;
             margin-top: 20px;
         }
+
         .form-card {
             background: #fff;
             border: 1px solid #b266ff;
@@ -78,17 +93,22 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             padding: 20px;
         }
+
         .form-card h2 {
-            color: #6a0dad; /* Purple for headers */
+            color: #6a0dad;
+            /* Purple for headers */
             margin-bottom: 20px;
         }
+
         .form-group {
             margin-bottom: 15px;
         }
+
         .form-group label {
             font-weight: 500;
             color: #2e7d32;
         }
+
         .form-group select,
         .form-group input {
             width: 100%;
@@ -96,6 +116,7 @@
             border: 1px solid #b266ff;
             border-radius: 5px;
         }
+
         .submit-btn {
             background-color: #2e7d32;
             color: #fff;
@@ -105,9 +126,11 @@
             font-weight: 500;
             transition: background-color 0.3s ease;
         }
+
         .submit-btn:hover {
             background-color: #1b5e20;
         }
+
         .back-btn {
             background-color: #d32f2f;
             color: #fff;
@@ -120,9 +143,11 @@
             margin-right: 10px;
             transition: background-color 0.3s ease;
         }
+
         .back-btn:hover {
             background-color: #b71c1c;
         }
+
         .action-btn {
             background-color: #2e7d32;
             color: #fff;
@@ -135,53 +160,96 @@
             margin-right: 10px;
             transition: background-color 0.3s ease;
         }
+
         .action-btn:hover {
             background-color: #1b5e20;
         }
+
         .view-btn {
-            background-color: #6a0dad; /* Purple for view button */
+            background-color: #6a0dad;
+            /* Purple for view button */
         }
+
         .view-btn:hover {
             background-color: #4a007a;
         }
+
         footer {
             background-color: #68b86c;
             color: #fff;
             padding: 20px 0;
             text-align: center;
             width: 100%;
-            flex-shrink: 0; /* Prevent footer from shrinking */
+            flex-shrink: 0;
+            /* Prevent footer from shrinking */
         }
+
         footer .container {
             max-width: 1200px;
         }
+
         footer .row {
             margin: 0;
         }
+
         footer h5 {
             color: #66bb6a;
         }
+
         footer hr {
             border-color: #b266ff;
             margin: 20px 0;
         }
+
         footer p {
             color: #6a0dad;
         }
+
         @media (max-width: 768px) {
-            .sidebar { width: 200px; }
-            .main-content { margin-left: 200px; width: calc(100% - 200px); }
-            .container { padding: 10px; }
+            .sidebar {
+                width: 200px;
+            }
+
+            .main-content {
+                margin-left: 200px;
+                width: calc(100% - 200px);
+            }
+
+            .container {
+                padding: 10px;
+            }
         }
+
         @media (max-width: 576px) {
-            .sidebar { width: 100%; height: auto; position: relative; }
-            .main-content { margin-left: 0; width: 100%; }
-            .sidebar .nav-link { display: inline-block; margin-right: 10px; margin-bottom: 5px; }
-            .submit-btn, .back-btn, .action-btn { display: block; width: 100%; margin-bottom: 10px; }
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+            }
+
+            .sidebar .nav-link {
+                display: inline-block;
+                margin-right: 10px;
+                margin-bottom: 5px;
+            }
+
+            .submit-btn,
+            .back-btn,
+            .action-btn {
+                display: block;
+                width: 100%;
+                margin-bottom: 10px;
+            }
         }
     </style>
     <title>Add Request</title>
 </head>
+
 <body>
     <div class="sidebar">
         <a class="navbar-brand" href="#">
@@ -189,14 +257,21 @@
         </a>
         <ul class="nav">
             <li class="nav-item"><a class="nav-link" href="/"><i class="fas fa-home"></i> Home</a></li>
-            <li class="nav-item"><a class="nav-link" href="/salesagentdashboard/"><i class="fas fa-list"></i> Sales Agent Dash Board</a></li>
-            <li class="nav-item"><a class="nav-link" href="/addchickrequest/"><i class="fas fa-plus"></i> Add Chick Request</a></li>
-            <li class="nav-item"><a class="nav-link" href="/addfeedrequest/"><i class="fas fa-plus-seedling"></i> Add Feed Request</a></li>
-            <li class="nav-item"><a class="nav-link" href="/registerfarmer/"><i class="fas fa-user-plus"></i> Register Farmer</a></li>
-            <li class="nav-item"><a class="nav-link" href="/salesagentchickrequests/"><i class="fas fa-list"></i> View Chick Requests</a></li>
-            <li class="nav-item"><a class="nav-link" href="/salesagentfeedrequests/"><i class="fas fa-seedling"></i> View Feed Requests</a></li>
+            <li class="nav-item"><a class="nav-link" href="/salesagentdashboard/"><i class="fas fa-list"></i> Sales
+                    Agent Dash Board</a></li>
+            <li class="nav-item"><a class="nav-link" href="/addchickrequest/"><i class="fas fa-plus"></i> Add Chick
+                    Request</a></li>
+            <li class="nav-item"><a class="nav-link" href="/addfeedrequest/"><i class="fas fa-plus-seedling"></i> Add
+                    Feed Request</a></li>
+            <li class="nav-item"><a class="nav-link" href="/registerfarmer/"><i class="fas fa-user-plus"></i> Register
+                    Farmer</a></li>
+            <li class="nav-item"><a class="nav-link" href="/salesagentchickrequests/"><i class="fas fa-list"></i> View
+                    Chick Requests</a></li>
+            <li class="nav-item"><a class="nav-link" href="/salesagentfeedrequests/"><i class="fas fa-seedling"></i>
+                    View Feed Requests</a></li>
         </ul>
-        <button class="logout-btn" onclick="window.location.href='/logout/'" style="background-color: #d32f2f; color: #fff; border: none; padding: 10px 20px; border-radius: 5px; font-weight: 500; width: 100%; margin-top: 20px; transition: background-color 0.3s ease;">
+        <button class="logout-btn" onclick="window.location.href='/logout/'"
+            style="background-color: #d32f2f; color: #fff; border: none; padding: 10px 20px; border-radius: 5px; font-weight: 500; width: 100%; margin-top: 20px; transition: background-color 0.3s ease;">
             Logout
         </button>
     </div>
@@ -211,7 +286,8 @@
                         <select name="farmer" id="farmer" required>
                             <option value="">Select Farmer</option>
                             {% for customer in farmers %}
-                            <option value="{{ customer.id }}">{{ customer.farmer_name }} (ID: {{ customer.farmer_id }})</option>
+                            <option value="{{ customer.id }}">{{ customer.farmer_name }} (ID: {{ customer.farmer_id }})
+                            </option>
                             {% endfor %}
                         </select>
                     </div>
@@ -275,14 +351,20 @@
                             <option value="phonecall">Phonecall</option>
                         </select>
                     </div>
-                    <div class="form-group">                        
-                        <a href="/addfeedrequest/" class="action-btn view-btn"><i class="fas fa-plus"></i> Add Feed Request</a>
+                    <div class="form-group">
+                        <a href="/addfeedrequest/" class="action-btn view-btn"><i class="fas fa-plus"></i> Add Feed
+                            Request</a>
                         <button type="submit" class="submit-btn">Submit Request</button>
                         <a href="/salesagentdashboard/" class="back-btn">Back to Dashboard</a>
                     </div>
                 </form>
+                {% if messages %}
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+                {% endif %}
             </div>
-        </div>    
+        </div>
     </div>
     <footer>
         <div class="container">
@@ -293,4 +375,5 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.9.2/umd/popper.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.min.js"></script>
 </body>
+
 </html>

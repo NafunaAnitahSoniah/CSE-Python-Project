@@ -43,6 +43,8 @@ INSTALLED_APPS = [
  # Custom user model, In case of a login, this specifies to django to consider userprofile model (farmer_user table) for the login details of the users
 AUTH_USER_MODEL = 'ChicksApp.UserProfile' 
 
+# To ensurlogin_required redirects to a login page
+LOGIN_URL = '/login/'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -52,6 +54,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    
 ]
 
 ROOT_URLCONF = 'XChicks.urls'
