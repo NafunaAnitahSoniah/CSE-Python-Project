@@ -7,106 +7,193 @@
     <title>Young4ChickS</title>
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Custom CSS with purple and green theme -->
+    <!-- Font Awesome for Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts for Modern Typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Custom CSS with enhanced purple and green theme -->
     <style>
+        :root {
+            --primary-purple: #6a0dad;
+            --light-purple: #b266ff;
+            --primary-green: #2e7d32;
+            --light-green: #66bb6a;
+            --dark-green: #1b5e20;
+            --bg-light: #f8f9fa;
+            --text-dark: #333;
+            --text-light: #fff;
+        }
         body {
-            background-color: #f8f9fa; /* Light gray background */
-            font-family: 'Arial', sans-serif;
-            color: #333;
+            background-color: var(--bg-light);
+            font-family: 'Poppins', sans-serif;
+            color: var(--text-dark);
+            line-height: 1.6;
         }
         .navbar {
-            background-color: #6a0dad; /* Deep purple */
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            background-color: var(--primary-purple);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 1rem 0;
         }
         .navbar-brand img {
-            height: 40px;
-        }
-        .nav-link {
-            color: #fff; /* White text for contrast */
-            font-weight: 500;
-            transition: color 0.3s ease;
-        }
-        .nav-link:hover {
-            color: #b266ff; /* Light purple hover */
-        }
-        .container-fluid {
-            max-width: 1200px;
-        }
-        .content-container {
-            margin-top: 80px;
-        }
-        /* Masonry-style grid using CSS columns */
-        .masonry-grid {
-            column-count: 3;
-            column-gap: 20px;
-            padding: 20px;
-        }
-        .masonry-item {
-            display: inline-block;
-            width: 100%;
-            margin-bottom: 20px;
-            background: #fff;
-            border: 1px solid #b266ff; /* Light purple border */
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            height: 50px;
             transition: transform 0.3s ease;
         }
+        .navbar-brand:hover img {
+            transform: scale(1.05);
+        }
+        .nav-link {
+            color: var(--text-light);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: color 0.3s ease, transform 0.3s ease;
+        }
+        .nav-link:hover {
+            color: var(--light-purple);
+            transform: translateY(-2px);
+        }
+        .container-fluid {
+            max-width: 1300px;
+        }
+        .content-container {
+            margin-top: 100px;
+            padding: 2rem;
+            background: linear-gradient(to bottom, rgba(106, 13, 173, 0.05), rgba(46, 125, 50, 0.05));
+            border-radius: 15px;
+        }
+        .masonry-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+            padding: 25px;
+        }
+        .masonry-item {
+            background: var(--text-light);
+            border: 2px solid var(--light-purple);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+        }
         .masonry-item:hover {
-            transform: translateY(-5px);
+            transform: translateY(-10px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.2);
         }
         .masonry-item img {
             width: 100%;
-            height: auto;
-            border-radius: 10px 10px 0 0;
+            height: 220px;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+        .masonry-item:hover img {
+            transform: scale(1.05);
         }
         .masonry-item-content {
-            padding: 15px;
+            padding: 20px;
+            text-align: center;
+        }
+        .masonry-item-content h5 {
+            color: var(--primary-purple);
+            font-weight: 700;
         }
         .btn-primary {
-            background-color: #2e7d32; /* Deep green */
-            border-color: #2e7d32;
+            background-color: var(--primary-green);
+            border-color: var(--primary-green);
+            font-weight: 600;
+            border-radius: 30px;
+            padding: 10px 25px;
+            transition: background-color 0.3s ease, transform 0.3s ease;
         }
         .btn-primary:hover {
-            background-color: #1b5e20; /* Darker green */
-            border-color: #1b5e20;
+            background-color: var(--dark-green);
+            border-color: var(--dark-green);
+            transform: translateY(-3px);
         }
         .alert-success {
-            background-color: #66bb6a; /* Light green for success */
-            color: #fff;
+            background-color: var(--light-green);
+            color: var(--text-light);
             border: none;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
         .alert-danger {
-            background-color: #6a0dad; /* Deep purple for errors */
-            color: #fff;
+            background-color: var(--primary-purple);
+            color: var(--text-light);
             border: none;
-        }
-        .alert {
             border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
-        /* Form styling */
         .form-control, .form-select {
-            border-color: #b266ff; /* Light purple border */
-            border-radius: 8px;
+            border-color: var(--light-purple);
+            border-radius: 10px;
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.05);
+            transition: border-color 0.3s ease;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-green);
+            box-shadow: 0 0 0 0.25rem rgba(46, 125, 50, 0.25);
         }
         .form-label {
-            font-weight: 500;
-            color: #6a0dad; /* Deep purple for labels */
+            font-weight: 600;
+            color: var(--primary-purple);
         }
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
+        @media (max-width: 992px) {
             .masonry-grid {
-                column-count: 2;
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
             }
         }
         @media (max-width: 576px) {
             .masonry-grid {
-                column-count: 1;
+                grid-template-columns: 1fr;
             }
+            .content-container {
+                margin-top: 80px;
+                padding: 1.5rem;
+            }
+        }
+        footer {
+            background: linear-gradient(to top, var(--primary-green), var(--light-green));
+            color: var(--text-light);
+            padding: 40px 0;
+            text-align: center;
+            position: relative;
+            bottom: 0;
+            width: 100%;
+            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+        }
+        footer h5 {
+            color: var(--primary-purple);
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+        footer a {
+            color: var(--light-purple);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        footer a:hover {
+            color: var(--text-light);
+        }
+        footer .social-icon {
+            font-size: 1.5rem;
+            margin: 0 15px;
+        }
+        footer hr {
+            border-color: var(--light-purple);
+            opacity: 0.5;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .content-container {
+            animation: fadeIn 1s ease-out;
         }
     </style>
 </head>
 <body>
-    <!-- Navbar -->
+    <!-- Enhanced Navbar with Icons -->
     <nav class="navbar navbar-expand-lg fixed-top">
         <div class="container-fluid">
             <a class="navbar-brand" href="{% url 'home' %}">
@@ -116,26 +203,23 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
+                <ul class="navbar-nav ms-auto align-items-center">
                     {% if user.is_authenticated %}
                         {% if user.role == 'farmer' %}
-                            <li class="nav-item"><a class="nav-link" href="{% url 'farmer_dashboard' %}">Dashboard</a></li>
-                            <li class="nav-item"><a class="nav-link" href="{% url 'submit_request' %}">Submit Request</a></li>
+                            <li class="nav-item"><a class="nav-link" href="#"><i class="fas fa-tachometer-alt me-1"></i> Dashboard</a></li>
                         {% elif user.role == 'manager' %}
-                            <li class="nav-item"><a class="nav-link" href="{% url 'manager_dashboard' %}">Dashboard</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{% url 'Managersdashboard' %}"><i class="fas fa-tachometer-alt me-1"></i> Dashboard</a></li>
                         {% elif user.role == 'sales_agent' %}
-                            <li class="nav-item"><a class="nav-link" href="{% url 'sales_dashboard' %}">Dashboard</a></li>
-                            <li class="nav-item"><a class="nav-link" href="{% url 'submit_request' %}">Submit Request</a></li>
+                            <li class="nav-item"><a class="nav-link" href="{% url 'salesagentdashboard' %}"><i class="fas fa-tachometer-alt me-1"></i> Dashboard</a></li>
                         {% endif %}
-                        <li class="nav-item"><a class="nav-link" href="{% url 'logout' %}">Logout</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt me-1"></i> Logout</a></li>
                     {% else %}
-                        <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Login</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{% url 'register_farmer' %}">Register</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'login' %}"><i class="fas fa-sign-in-alt me-1"></i> Login</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'registerfarmer' %}"><i class="fas fa-user-plus me-1"></i> Register</a></li>
                     {% endif %}
-                    <!-- Social Icon -->
                     <li class="nav-item">
                         <a class="nav-link" href="https://twitter.com/young4chicks" target="_blank">
-                            <img src="{% static 'images/twitter-icon.png' %}" alt="Twitter" style="height: 20px;">
+                            <i class="fab fa-twitter" style="font-size: 1.2rem;"></i>
                         </a>
                     </li>
                 </ul>
@@ -143,11 +227,16 @@
         </div>
     </nav>
 
-    <!-- Main Content -->
+    <!-- Main Content with Enhanced Container -->
     <div class="container-fluid content-container">
         {% if messages %}
             {% for message in messages %}
                 <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {% if message.tags == 'success' %}
+                        <i class="fas fa-check-circle me-2"></i>
+                    {% else %}
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                    {% endif %}
                     {{ message }}
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
@@ -157,34 +246,32 @@
         {% endblock %}
     </div>
 
-    <!-- Bootstrap 5 JS (required for navbar toggle) -->
+    <!-- Bootstrap 5 JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
-
-
-<footer style="background-color: #68b86c; color: #fff; padding: 20px 0; text-align: center; position: relative; bottom: 0; width: 100%;">
+<footer>
     <div class="container">
-        <div class="row">
+        <div class="row gy-4">
             <div class="col-12 col-md-4">
-                <h5 style="color: #66bb6a;">About Us</h5>
+                <h5>About Us</h5>
                 <p>Young4ChickS is dedicated to empowering young farmers with quality chicks and feeds. Join us in building a sustainable future!</p>
             </div>
             <div class="col-12 col-md-4">
-                <h5 style="color: #66bb6a;">Contact</h5>
-                <p>Email: info@young4chicks.com</p>
-                <p>Phone: +254 712 345 678</p>
-                <p>Address: Nairobi, Kenya</p>
+                <h5>Contact</h5>
+                <p><i class="fas fa-envelope me-2"></i> Email: info@young4chicks.com</p>
+                <p><i class="fas fa-phone me-2"></i> Phone: +254 712 345 678</p>
+                <p><i class="fas fa-map-marker-alt me-2"></i> Address: Nairobi, Kenya</p>
             </div>
             <div class="col-12 col-md-4">
-                <h5 style="color: #66bb6a;">Follow Us</h5>
-                <a href="https://x.com/young4chicks" target="_blank" style="color: #b266ff; margin: 0 10px; text-decoration: none;">X</a>
-                <a href="https://facebook.com/young4chicks" target="_blank" style="color: #b266ff; margin: 0 10px; text-decoration: none;">Facebook</a>
-                <a href="https://instagram.com/young4chicks" target="_blank" style="color: #b266ff; margin: 0 10px; text-decoration: none;">Instagram</a>
+                <h5>Follow Us</h5>
+                <a href="https://x.com/young4chicks" target="_blank" class="social-icon"><i class="fab fa-x-twitter"></i></a>
+                <a href="https://facebook.com/young4chicks" target="_blank" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+                <a href="https://instagram.com/young4chicks" target="_blank" class="social-icon"><i class="fab fa-instagram"></i></a>
             </div>
         </div>
-        <hr style="border-color: #b266ff; margin: 20px 0;">
-        <p style="color: #6a0dad;">&copy; 2025 Young4ChickS. All rights reserved. | Designed by Nafuna Anitah Soniah </p>
+        <hr>
+        <p>&copy; 2025 Young4ChickS. All rights reserved. | Designed by Nafuna Anitah Soniah</p>
     </div>
 </footer>
 </html>

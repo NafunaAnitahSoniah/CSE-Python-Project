@@ -37,7 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'ChicksApp'
+    'ChicksApp',
+    'widget_tweaks',
 ]
 
  # Custom user model, In case of a login, this specifies to django to consider userprofile model (farmer_user table) for the login details of the users
@@ -75,7 +76,7 @@ TEMPLATES = [
     },
 ]
 
-STATIC_URL = '/static/'
+STATIC_URL = '/static/'  # ensure leading slash so {% static %} builds absolute path
 STATICFILES_DIRS = [BASE_DIR / 'static']
 
 WSGI_APPLICATION = 'XChicks.wsgi.application'
@@ -126,7 +127,8 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'static/'
+# (Removed duplicate STATIC_URL redefinition that produced relative paths like
+#  managersdashboard/static/css/design.css and broke styling)
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

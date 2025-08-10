@@ -21,8 +21,11 @@ from ChicksApp import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', views.indexpage, name='index'),
+    path('', views.indexpage, name='home'),  # home used in template
     path('signup/', views.signup, name='signup'),
+    path('login/', views.Login, name='login'),  # lowercase conventional
+    path('logout/', views.Logout, name='logout'),
+    # Backwards compatibility for older name references
     path('login/', views.Login, name='Login'),
     path('logout/', views.Logout, name='Logout'),
 
@@ -35,6 +38,7 @@ urlpatterns = [
     path('chickstock/', views.chickStock, name='Chickstock'),
     path('feedstock/', views.feedStock, name='Feedstock'),
     path('updatechickstock/', views.UpdateChickStock, name='Updatechickstock'),
+    path('updatechickstock/<int:stock_id>/', views.UpdateChickStock, name='Updatechickstock_edit'),
     path('updatefeedstock/', views.UpdateFeedStock, name='Updatefeedstock'),
     path('reports/', views.Reports, name='Reports'),
     path('sales/', views.Sales, name='Sales'),

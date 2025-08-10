@@ -1,220 +1,164 @@
-{% load static %} <!--for loading static files -->
+{% load static %}
+{% load widget_tweaks %}
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <meta name="Description" content="Enter your description here" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <link rel="stylesheet" href="assets/css/style.css">
-    <style>
-        body {
-            background-color: #f8f9fa;
-            /* Light gray background */
-            font-family: 'Arial', sans-serif;
-            color: #333;
-            margin: 0;
-            padding: 0;
-            min-height: 100vh;
-            /* Ensure body takes full viewport height */
-            display: flex;
-            flex-direction: column;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <meta name="Description" content="Login Page" />
+  <title>{{ title }}</title>
 
-        .container {
-            max-width: 1200px;
-            margin-top: 80px;
-            padding: 20px;
-            flex: 1 0 auto;
-            /* Allow container to grow but not shrink below content height */
-        }
+  <!-- Bootstrap & Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet" />
 
-        .form-container {
-            background: #fff;
-            border: 1px solid #b266ff;
-            /* Light purple border */
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            padding: 30px;
-            /* Increased padding for better spacing */
-            transition: transform 0.3s ease;
-        }
+  <style>
+    body {
+      background-color: #f8f9fa;
+      font-family: 'Arial', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
 
-        .form-container:hover {
-            transform: translateY(-5px);
-        }
+    .form-container {
+      background: #fff;
+      border: 1px solid #b266ff;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      padding: 40px 30px;
+      width: 100%;
+      max-width: 450px;
+    }
 
-        .form-table {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0 15px;
-            /* Vertical spacing between rows */
-        }
+    .form-container h2 {
+      text-align: center;
+      margin-bottom: 30px;
+      color: #6a0dad;
+      font-weight: bold;
+    }
 
-        .form-table td {
-            padding: 10px 15px;
-            /* Horizontal and vertical padding for cells */
-            vertical-align: top;
-            /* Align labels and inputs at the top */
-        }
+    .form-group {
+      position: relative;
+      margin-bottom: 20px;
+    }
 
-        .form-table label {
-            font-weight: 500;
-            color: #6a0dad;
-            /* Deep purple */
-            display: block;
-            /* Ensure labels take full width */
-            margin-bottom: 5px;
-            /* Space between label and input */
-            font-size: 1.1rem;
-            /* Slightly larger font for readability */
-        }
+    .form-group i {
+      position: absolute;
+      top: 50%;
+      left: 12px;
+      transform: translateY(-50%);
+      color: #6a0dad;
+    }
 
-        .form-control {
-            border-color: #b266ff;
-            /* Light purple border */
-            border-radius: 8px;
-            padding: 10px;
-            /* Increased padding for inputs */
-            width: 100%;
-            /* Full width for better alignment */
-            box-sizing: border-box;
-            /* Include padding in width calculation */
-        }
+    .form-control {
+      padding-left: 40px;
+      border-radius: 8px;
+      border: 1px solid #b266ff;
+    }
 
-        .btn-primary {
-            background-color: #2e7d32;
-            /* Deep green */
-            border-color: #2e7d32;
-            width: 100%;
-            padding: 12px;
-            /* Increased padding for button */
-            font-weight: 500;
-            font-size: 1.1rem;
-            /* Larger text for button */
-        }
+    .btn-primary {
+      background-color: #2e7d32;
+      border-color: #2e7d32;
+      width: 100%;
+      padding: 12px;
+      font-size: 1rem;
+      font-weight: 500;
+    }
 
-        .btn-primary:hover {
-            background-color: #1b5e20;
-            /* Darker green */
-            border-color: #1b5e20;
-        }
+    .btn-primary:hover {
+      background-color: #1b5e20;
+      border-color: #1b5e20;
+    }
 
-        .error-message {
-            color: #6a0dad;
-            /* Deep purple for errors */
-            background-color: #f8d7da;
-            /* Light red background */
-            padding: 5px 10px;
-            border-radius: 5px;
-            font-size: 0.9rem;
-            /* Smaller error text */
-            margin-top: 5px;
-            display: none;
-            /* Hidden by default, shown via JavaScript if needed */
-        }
+    .error-message {
+      display: none;
+      color: #721c24;
+      background-color: #f8d7da;
+      padding: 10px;
+      border-radius: 5px;
+      margin-top: 10px;
+      font-size: 0.9rem;
+    }
 
-        footer {
-            background-color: #68b86c;
-            color: #fff;
-            padding: 20px 0;
-            text-align: center;
-            width: 100%;
-            flex-shrink: 0;
-            /* Prevent footer from shrinking */
-        }
+    footer {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      background-color: #68b86c;
+      color: #fff;
+      padding: 15px 0;
+      text-align: center;
+    }
 
-        footer .container {
-            max-width: 1200px;
-        }
-
-        footer .row {
-            margin: 0;
-        }
-
-        footer h5 {
-            color: #66bb6a;
-        }
-
-        footer hr {
-            border-color: #b266ff;
-            margin: 20px 0;
-        }
-
-        footer p {
-            color: #6a0dad;
-        }
-
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-            .container {
-                margin-top: 40px;
-                padding: 10px;
-            }
-
-            .form-container {
-                padding: 20px;
-                /* Reduced padding on mobile */
-            }
-
-            .form-table td {
-                padding: 5px 10px;
-                /* Reduced padding on mobile */
-                display: block;
-                /* Stack labels and inputs on mobile */
-            }
-
-            .form-table label {
-                margin-bottom: 3px;
-                /* Reduced spacing on mobile */
-            }
-
-            .form-control {
-                padding: 8px;
-                /* Reduced input padding on mobile */
-            }
-
-            .btn-primary {
-                padding: 10px;
-                /* Reduced button padding on mobile */
-            }
-        }
-    </style>
-    <title> {{ title }}</title>
+    footer p {
+      color: #6a0dad;
+      margin: 0;
+    }
+  </style>
 </head>
 
 <body>
-    {% block content %}
-    <div class="container">
-        <div class="form-container">
-            <form method="post">
-                {% csrf_token %}
-
-                {{ form.as_table }}
-                <button type="submit" class="btn btn-primary">
-                    Log In
-                </button>
-                <div id="error-message" class="error-message">
-                    Invalid username or password. Please try again.
-                </div>
-
-            </form>
+  {% block content %}
+  <div class="form-container">
+    <h2>Login</h2>
+    <form method="post" id="login-form">
+      {% csrf_token %}
+      {% if messages %}
+        {% for message in messages %}
+          <div class="alert alert-danger py-2" role="alert">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+      {% if form.non_field_errors %}
+        <div class="alert alert-danger py-2" role="alert">
+          {% for error in form.non_field_errors %}{{ error }}<br>{% endfor %}
         </div>
-    </div>
-    {% endblock %}
+      {% endif %}
 
-    <footer>
-        <div class="container">
-            <hr>
-            <p>&copy; 2025 Young4ChickS. All rights reserved. | Designed by Nafuna Anitah Soniah</p>
+      <div class="form-group">
+        <i class="fas fa-user"></i>
+        {% render_field form.username class="form-control" placeholder="Username" %}
+        {% if form.username.errors %}
+          <div class="text-danger small">{% for e in form.username.errors %}{{ e }}{% endfor %}</div>
+        {% endif %}
+      </div>
+
+      <div class="form-group">
+        <i class="fas fa-lock"></i>
+        {% render_field form.password class="form-control" placeholder="Password" %}
+        <div id="password-error" class="error-message">
+          Password must be at least 8 characters.
         </div>
-    </footer>
+        {% if form.password.errors %}
+          <div class="text-danger small">{% for e in form.password.errors %}{{ e }}{% endfor %}</div>
+        {% endif %}
+      </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.9.2/umd/popper.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.min.js"></script>
+      <button type="submit" class="btn btn-primary mt-3">Log In</button>
+    </form>
+  </div>
+  {% endblock %}
+
+  <footer>
+    <p>&copy; 2025 Young4ChickS. All rights reserved. | Designed by Nafuna Anitah Soniah</p>
+  </footer>
+
+  <script>
+    document.getElementById('login-form').addEventListener('submit', function (e) {
+      const passwordInput = document.querySelector('input[type="password"]');
+      const errorMessage = document.getElementById('password-error');
+
+      if (passwordInput && passwordInput.value.length < 8) {
+        e.preventDefault();
+        errorMessage.style.display = 'block';
+      } else {
+        errorMessage.style.display = 'none';
+      }
+    });
+  </script>
 </body>
 
 </html>

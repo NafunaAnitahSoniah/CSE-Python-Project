@@ -17,6 +17,8 @@ class UserProfile(AbstractUser): #abstract user is the model that helps us store
     phone = models.CharField(
         max_length=15,
         unique=True,
+        null=True,
+        blank=True,
         validators=[RegexValidator(r'^\+?\d{10,15}$', 'Enter a valid phone number.')]
     )
     title = models.CharField(max_length=30, blank=True)

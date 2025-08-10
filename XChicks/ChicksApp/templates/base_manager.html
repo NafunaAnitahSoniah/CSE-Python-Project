@@ -1,0 +1,50 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{% block title %}Manager | Young4ChickS{% endblock %}</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link rel="stylesheet" href="{% static 'css/design.css' %}">
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+<div class="mobile-bar"> <button id="menuToggle" aria-label="Toggle navigation"><i class="fas fa-bars"></i></button> <strong>Young4ChickS</strong></div>
+<div class="layout-wrapper">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand"><img src="{% static 'images/logo.png' %}" alt="Logo"><strong>Young4ChickS</strong></div>
+    <ul class="nav-vertical">
+      <li><a href="/" class="{% if request.path == '/' %}active{% endif %}"><i class="fas fa-home"></i> Home</a></li>
+      <li><a href="/managersdashboard/" class="{% if '/managersdashboard' in request.path %}active{% endif %}"><i class="fas fa-gauge-high"></i> Dashboard</a></li>
+      <li><a href="/chickrequests/" class="{% if '/chickrequests' in request.path %}active{% endif %}"><i class="fas fa-egg"></i> Chick Requests</a></li>
+      <li><a href="/feedrequests/" class="{% if '/feedrequests' in request.path %}active{% endif %}"><i class="fas fa-seedling"></i> Feed Requests</a></li>
+      <li><a href="/chickstock/" class="{% if '/chickstock' in request.path %}active{% endif %}"><i class="fas fa-warehouse"></i> Chick Stock</a></li>
+      <li><a href="/feedstock/" class="{% if '/feedstock' in request.path %}active{% endif %}"><i class="fas fa-boxes-stacked"></i> Feed Stock</a></li>
+      <li><a href="/farmerrecords/" class="{% if '/farmerrecords' in request.path %}active{% endif %}"><i class="fas fa-users"></i> Farmers</a></li>
+      <li><a href="/sales/" class="{% if '/sales' in request.path %}active{% endif %}"><i class="fas fa-sack-dollar"></i> Sales</a></li>
+      <li><a href="/reports/" class="{% if '/reports' in request.path %}active{% endif %}"><i class="fas fa-chart-line"></i> Reports</a></li>
+    </ul>
+    <div class="sidebar-footer">
+      <form action="/logout/" method="post">{% csrf_token %}<button class="btn btn-danger btn-logout"><i class="fas fa-right-from-bracket"></i> Logout</button></form>
+    </div>
+  </aside>
+  <main class="main">
+    {% if messages %}
+      <div class="messages">
+        {% for message in messages %}
+          <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+    {% block content %}{% endblock %}
+    <footer class="site-footer"><p>&copy; 2025 Young4ChickS. All rights reserved.</p></footer>
+  </main>
+</div>
+<script>
+  const toggle=document.getElementById('menuToggle');
+  if(toggle){ toggle.addEventListener('click',()=>document.getElementById('sidebar').classList.toggle('open')); }
+</script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

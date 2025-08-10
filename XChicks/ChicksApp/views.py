@@ -1,19 +1,20 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.db.models import Q
+from django.db.models import Sum, Count
+from django.core.exceptions import PermissionDenied
 from .models import *
 from .forms import *
-from django.utils import timezone
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import AuthenticationForm
 
 
 # Create your views here.
-#To handle sign up of salesagent user and the manager user
+# Landing page
 def indexpage(request):
-    details = request.objects.all().order_by('-id')
-    return render(request, 'index.html',{'details': details})
+    # Example data – latest 10 chick requests (safe even if none exist)
+    details = ChickRequest.objects.order_by('-id')[:10]
+    return render(request, 'index.html', {'details': details})
 
 def signup(request):
     if request.method == 'POST':
@@ -27,159 +28,293 @@ def signup(request):
             username = form_data.cleaned_data.get('username')
             email = form_data.cleaned_data.get('email')
             #so after successfully registering, you are directed to the login form/ page
-            return redirect('/login')
+            return redirect('login')
     #in case there is no data coming from the UserCreation form, direct to the signup.html page   
     else:
         form_data = UserCreation()
     return render(request, 'signup.html', {'form_data': form_data})
 
 def Login(request):
+    # If already authenticated send to their dashboard
+    if request.user.is_authenticated:
+        return _redirect_by_role(request.user)
+
+    form = AuthenticationForm(request, data=request.POST or None)
     if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(request, username=username, password=password)
+            if user:
+                login(request, user)
+                return _redirect_by_role(user)
+        # invalid: surface error message
+        messages.error(request, 'Invalid username or password.')
 
-        user = authenticate(request, username=username, password=password)
-        if user is not None and user.role == 'sales_agent':
+    return render(request, 'login.html', {'form': form, 'title': 'Login'})
 
-            form = login(request, user)
-            return redirect('/salesagentdashboard')
-        
-        if user is not None and user.role == 'manager':
 
-            form = login(request, user)
-            return redirect('/managersdashboard')
-        else:
-            print('something is wrong')
+def _redirect_by_role(user):
+    if getattr(user, 'role', None) == 'sales_agent':
+        return redirect('salesagentdashboard')
+    if getattr(user, 'role', None) == 'manager':
+        return redirect('Managersdashboard')
+    return redirect('/')
 
-    form = AuthenticationForm()
-    
-    return render(request, 'login.html', {'form':form, 'title':'login'})
+
+def role_required(role):
+    def decorator(view_func):
+        @login_required
+        def _wrapped(request, *args, **kwargs):
+            if getattr(request.user, 'role', None) != role:
+                raise PermissionDenied
+            return view_func(request, *args, **kwargs)
+        return _wrapped
+    return decorator
 
 
 #For the Managers
 
+@role_required('manager')
 def Managersdashboard(request):
-    
-    return render(request, 'managersdashboard.html' )
+    total_users = UserProfile.objects.count()
+    chick_stock = ChickStock.objects.aggregate(total=Sum('stock_quantity'))['total'] or 0
+    feed_stock = FeedStock.objects.aggregate(total=Sum('feed_quantity'))['total'] or 0
+    request_stats = ChickRequest.objects.values('status').annotate(c=Count('id'))
+    stats_map = {r['status']: r['c'] for r in request_stats}
+    completed_requests = stats_map.get('completed', 0)
+    approved_requests = stats_map.get('approved', 0)
+    pending_requests = stats_map.get('pending', 0)
+    rejected_requests = stats_map.get('rejected', 0)
+    total_sales = Sale.objects.count()
+    deliveries_made = ChickRequest.objects.filter(delivered=True).count()
+    pending_deliveries = ChickRequest.objects.filter(status='approved', delivered=False).count()
+    farmers_with_feeds = FeedAllocation.objects.values('chick_request__farmer').distinct().count()
+    farmers_paid = FeedAllocation.objects.filter(payment_status='paid').count()
+    pending_payments = FeedAllocation.objects.filter(payment_status='pending').count()
+    context = {
+        'total_users': total_users,
+        'chick_stock': chick_stock,
+        'feed_stock': feed_stock,
+        'completed_requests': completed_requests,
+        'approved_requests': approved_requests,
+        'pending_requests': pending_requests,
+        'rejected_requests': rejected_requests,
+        'total_sales': total_sales,
+        'deliveries_made': deliveries_made,
+        'pending_deliveries': pending_deliveries,
+        'farmers_with_feeds': farmers_with_feeds,
+        'farmers_paid': farmers_paid,
+        'pending_payments': pending_payments,
+    }
+    return render(request, 'managersdashboard.html', context)
 
+@role_required('manager')
 def ViewChickRequests(request):
+    requests_qs = ChickRequest.objects.select_related('farmer').order_by('-request_date')[:200]
+    return render(request, 'viewChickrequests.html', {'requests': requests_qs})
 
-    return render(request, 'viewChickrequests.html')
-
+@role_required('manager')
 def ViewFeedRequests(request):
+    feed_allocs = FeedAllocation.objects.select_related('chick_request', 'chick_request__farmer').order_by('-id')[:200]
+    return render(request, 'viewFeedAllocations.html', {'allocations': feed_allocs})
 
-    return render(request, 'viewFeedAllocations.html')
-
+@role_required('manager')
 def FarmerReview(request):
-     return render(request, 'farmerReview.html')
+    return render(request, 'farmerReview.html')
 
+@role_required('manager')
 def Approverequest(request):
     return render(request, 'approveRequest.html')
 
 
+@role_required('manager')
 def FarmerRecords(request):
-     return render(request, 'farmerRecords.html')
+    farmers = Customer.objects.order_by('-registration_date')[:500]
+    return render(request, 'farmerRecords.html', {'farmers': farmers})
 
+@role_required('manager')
 def chickStock(request):
-    return render(request, 'chickStock.html')
+    chick_stocks = ChickStock.objects.order_by('batch_name')
+    return render(request, 'chickStock.html', {'chick_stocks': chick_stocks})
 
+@role_required('manager')
 def feedStock(request):
-    return render(request, 'feedStock.html')
+    feed_stocks = FeedStock.objects.order_by('stock_name')
+    return render(request, 'feedStock.html', {'feed_stocks': feed_stocks})
 
-def UpdateChickStock(request):
+@role_required('manager')
+def UpdateChickStock(request, stock_id=None):
+    # Try to get existing stock if ID is provided
+    chickstock = None
+    if stock_id:
+        try:
+            chickstock = ChickStock.objects.get(id=stock_id)
+        except ChickStock.DoesNotExist:
+            messages.error(request, "Stock not found!")
+            return redirect('/chickstock/')
+    
+    # Handle form submission
+    if request.method == 'POST':
+        # Get form data
+        batch_name = request.POST.get('batch_name')
+        chick_type = request.POST.get('chick_type')
+        chick_breed = request.POST.get('chick_breed')
+        chick_age = request.POST.get('chick_age')
+        chick_price = request.POST.get('chick_price')
+        stock_quantity = request.POST.get('stock_quantity')
+        
+        try:
+            # Check if this batch already exists
+            if chickstock:  # Editing existing stock
+                existing_stock = chickstock
+            else:
+                existing_stock = ChickStock.objects.filter(batch_name=batch_name).first()
+            
+            if existing_stock:
+                # Update existing stock
+                existing_stock.batch_name = batch_name
+                existing_stock.chick_type = chick_type
+                existing_stock.chick_breed = chick_breed
+                existing_stock.chick_age = chick_age
+                existing_stock.chick_price = chick_price
+                existing_stock.stock_quantity = stock_quantity
+                existing_stock.save()
+                messages.success(request, f"Stock '{batch_name}' updated successfully!")
+            else:
+                # Create new stock entry
+                new_stock = ChickStock(
+                    batch_name=batch_name,
+                    chick_type=chick_type,
+                    chick_breed=chick_breed,
+                    chick_age=chick_age,
+                    chick_price=chick_price,
+                    stock_quantity=stock_quantity
+                )
+                new_stock.save()
+                messages.success(request, f"New stock '{batch_name}' added successfully!")
+            
+            # Redirect to the stock listing page
+            return redirect('/chickstock/')
+        
+        except Exception as e:
+            # Handle errors
+            messages.error(request, f"Error updating stock: {str(e)}")
+            
+            # Re-populate the form with submitted values
+            form_data = type('', (), {})()
+            form_data.batch_name = batch_name
+            form_data.chick_type = chick_type
+            form_data.chick_breed = chick_breed
+            form_data.chick_age = chick_age
+            form_data.chick_price = chick_price
+            form_data.stock_quantity = stock_quantity
+            return render(request, 'updateChickStock.html', {'chickstock': form_data})
+    
+    # For GET requests
+    if not chickstock:
+        # Show empty form for new stock
+        class EmptyChickStock:
+            def __init__(self):
+                self.batch_name = ""
+                self.chick_type = ""
+                self.chick_breed = ""
+                self.chick_age = ""
+                self.chick_price = ""
+                self.stock_quantity = ""
+        
+        chickstock = EmptyChickStock()
+    
+    return render(request, 'updateChickStock.html', {'chickstock': chickstock})
 
-    return render(request, 'updateChickStock.html')
-
+@role_required('manager')
 def UpdateFeedStock(request):
-
     return render(request, 'updateFeedStock.html')
 
+@role_required('manager')
 def Reports(request):
-
     return render(request, 'reports.html')
 
+@role_required('manager')
 def Sales(request):
-
     return render(request, 'sales.html')
 
 
 
+@role_required('manager')
 def DeleteRequest(request):
-     return render(request, 'deleteRequest.html')
+    return render(request, 'deleteRequest.html')
 
 
 
 
 #For the Sales Agents
+@role_required('sales_agent')
 def SalesAgentdashboard(request):
-    return render(request, '1salesAgentdashboard.html')
+    my_requests = ChickRequest.objects.filter(created_by=request.user)
+    status_counts = my_requests.values('status').annotate(c=Count('id'))
+    sc_map = {s['status']: s['c'] for s in status_counts}
+    total_my_requests = my_requests.count()
+    total_chicks_requested = my_requests.aggregate(total=Sum('quantity'))['total'] or 0
+    delivered = my_requests.filter(delivered=True).count()
+    context = {
+        'total_my_requests': total_my_requests,
+        'total_chicks_requested': total_chicks_requested,
+        'my_pending': sc_map.get('pending', 0),
+        'my_approved': sc_map.get('approved', 0),
+        'my_rejected': sc_map.get('rejected', 0),
+        'my_completed': sc_map.get('completed', 0),
+        'delivered': delivered,
+    }
+    return render(request, '1salesAgentdashboard.html', context)
 
-@login_required
+@role_required('sales_agent')
 def AddChickRequest(request):
-        if request.method == 'POST':
-            # Extract form data
-            farmer_id = request.POST.get('farmer')
-            chick_request_id = request.POST.get('chick_request_id')
-            farmer_type = request.POST.get('farmer_type')
-            chick_type = request.POST.get('chick_type')
-            chick_breed = request.POST.get('chick_breed')
-            quantity = request.POST.get('quantity')
-            chick_period = request.POST.get('chick_period')
-            # Convert feed_taken to boolean
-            feed_taken = request.POST.get('feed_taken') == 'True'  
-            payment_terms = request.POST.get('payment_terms')
-            received_through = request.POST.get('received_through')
+    if request.method == 'POST':
+        farmer_id = request.POST.get('farmer')
+        farmer = get_object_or_404(Customer, id=farmer_id)
+        chick_request = ChickRequest(
+            farmer=farmer,
+            chick_request_id=request.POST.get('chick_request_id'),
+            farmer_type=request.POST.get('farmer_type'),
+            chick_type=request.POST.get('chick_type'),
+            chick_breed=request.POST.get('chick_breed'),
+            quantity=request.POST.get('quantity'),
+            chick_period=request.POST.get('chick_period'),
+            feed_taken=request.POST.get('feed_taken') == 'True',
+            payment_terms=request.POST.get('payment_terms'),
+            received_through=request.POST.get('received_through'),
+            created_by=request.user
+        )
+        try:
+            chick_request.full_clean()
+            chick_request.save()
+            messages.success(request, 'Chick request submitted successfully!')
+            return redirect('salesagentdashboard')
+        except Exception as e:
+            messages.error(request, str(e))
+    farmers = Customer.objects.all()
+    return render(request, '1addChickRequests.html', {'farmers': farmers})
 
-            # Get the farmer instance
-            farmer = get_object_or_404(Customer, id=farmer_id)
-
-            # Create a new ChickRequest instance
-            chick_request = ChickRequest(
-                farmer=farmer,
-                chick_request_id=chick_request_id,
-                farmer_type=farmer_type,
-                chick_type=chick_type,
-                chick_breed=chick_breed,
-                quantity=quantity,
-                chick_period=chick_period,
-                feed_taken=feed_taken,
-                payment_terms=payment_terms,
-                received_through=received_through,
-                # Assuming the logged-in user is the creator
-                created_by=request.user  
-            )
-
-            try:
-                # Validate and save the instance
-                chick_request.full_clean()  # Runs the clean method including custom validations
-                chick_request.save()
-                messages.success(request, 'Chick request submitted successfully!')
-                return redirect('salesagentdashboard')  # Redirect to dashboard after success
-            except ValidationError as e:
-                messages.error(request, '\n'.join(e.messages))  # Display validation errors
-                return redirect('add_chick_request')
-
-    # GET request: Render the form with farmer options
-        farmers = Customer.objects.all()  # Fetch all farmers for the dropdown
-        return render(request, '1addChickRequests.html', {'farmers': farmers})
-
+@role_required('sales_agent')
 def AddFeedRequest(request):
     return render(request, '1addFeedRequest.html')
 
+@role_required('sales_agent')
 def RegisterFarmer(request):
     return render(request, '1registerfarmer.html')
 
-def AddChickRequest(request):
-    return render(request, '1addChickRequests.html') 
+# duplicate duplicate definitions removed above
 
-def AddFeedRequest(request):
-    return render(request, '1addFeedRequest.html')
-
+@role_required('sales_agent')
 def ViewSalesAgentChickRequests(request):
-    return render(request, '1viewchickrequests.html')
+    my_requests = ChickRequest.objects.filter(created_by=request.user).select_related('farmer').order_by('-request_date')
+    return render(request, '1viewchickrequests.html', {'requests': my_requests})
 
+@role_required('sales_agent')
 def ViewSalesAgentFeedRequests(request):
-    return render(request, '1viewfeedrequests.html')
+    my_feed = FeedAllocation.objects.filter(chick_request__created_by=request.user).select_related('chick_request', 'chick_request__farmer')
+    return render(request, '1viewfeedrequests.html', {'allocations': my_feed})
 
 
 def Logout(request):
