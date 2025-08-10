@@ -1,317 +1,50 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <meta name="Description" content="Farmer Requests Overview">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <link rel="stylesheet" href="assets/css/style.css">
-    <style>
-        body {
-            background-color: #f8f9fa;
-            font-family: 'Arial', sans-serif;
-            color: #333;
-            margin: 0;
-            padding: 0;
-            min-height: 100vh; /* Ensure body takes full viewport height */
-            display: flex;
-            flex-direction: column;
-        }
-        .sidebar {
-            width: 250px;
-            background-color: #6a0dad;
-            position: fixed;
-            height: 100%;
-            padding-top: 20px;
-            box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
-            transition: width 0.3s ease;
-        }
-        .sidebar .navbar-brand {
-            padding: 10px 20px;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-        }
-        .sidebar .navbar-brand img {
-            height: 40px;
-            margin-right: 10px;
-        }
-        .sidebar .nav {
-            flex-direction: column;
-            padding: 0 20px;
-        }
-        .sidebar .nav-link {
-            color: #fff;
-            font-weight: 500;
-            padding: 10px 15px;
-            margin-bottom: 10px;
-            border-radius: 5px;
-            transition: background-color 0.3s ease, color 0.3s ease;
-            display: flex;
-            align-items: center;
-        }
-        .sidebar .nav-link i {
-            margin-right: 10px;
-        }
-        .sidebar .nav-link:hover {
-            color: #b266ff;
-            background-color: rgba(255, 255, 255, 0.1);
-        }
-        .main-content {
-            margin-left: 250px;
-            width: calc(100% - 250px);
-            padding: 20px;
-            transition: margin-left 0.3s ease;
-            flex: 1 0 auto; /* Allow main content to grow but not shrink below content height */
-        }
-        .container {
-            max-width: 1200px;
-            margin-top: 20px;
-        }
-        .farmer-card {
-            background: #fff;
-            border: 1px solid #b266ff;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-            height: calc(100vh - 80px); /* Adjust for padding and header */
-            overflow-y: auto;
-            overflow-x: auto;
-        }
-        .farmer-card h2 {
-            color: #6a0dad;
-            margin-bottom: 20px;
-        }
-        .section-title {
-            color: #6a0dad;
-            font-size: 1.2rem;
-            margin-top: 20px;
-            margin-bottom: 10px;
-        }
-        .table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-        }
-        th, td {
-            padding: 10px;
-            text-align: left;
-            border-bottom: 1px solid #b266ff;
-        }
-        th {
-            background-color: #6a0dad;
-            color: #fff;
-        }
-        tr:nth-child(even) {
-            background-color: #f8f9fa;
-        }
-        tr:hover {
-            background-color: #e0e0e0;
-        }
-        .action-btn {
-            padding: 8px 15px;
-            border: none;
-            border-radius: 5px;
-            font-weight: 500;
-            margin-right: 10px;
-            text-decoration: none;
-            display: inline-block;
-        }
-        .approve-btn { background-color: #2e7d32; color: #fff; }
-        .approve-btn:hover { background-color: #1b5e20; }
-        .reject-btn { background-color: #d32f2f; color: #fff; }
-        .reject-btn:hover { background-color: #b71c1c; }
-        footer {
-            background-color: #68b86c;
-            color: #fff;
-            padding: 20px 0;
-            text-align: center;
-            width: 100%;
-            flex-shrink: 0; /* Prevent footer from shrinking */
-        }
-        footer .container {
-            max-width: 1200px;
-        }
-        footer .row {
-            margin: 0;
-        }
-        footer h5 {
-            color: #66bb6a;
-        }
-        footer hr {
-            border-color: #b266ff;
-            margin: 20px 0;
-        }
-        footer p {
-            color: #6a0dad;
-        }
-        @media (max-width: 768px) {
-            .sidebar { width: 200px; }
-            .main-content { margin-left: 200px; width: calc(100% - 200px); }
-            .container { padding: 10px; }
-            .farmer-card { height: auto; }
-        }
-        @media (max-width: 576px) {
-            .sidebar { width: 100%; height: auto; position: relative; }
-            .main-content { margin-left: 0; width: 100%; }
-            .sidebar .nav-link { display: inline-block; margin-right: 10px; margin-bottom: 5px; }
-            th, td { display: block; text-align: right; }
-            th { background: none; color: #6a0dad; font-weight: bold; }
-            td:before { content: attr(data-label); position: absolute; left: 10px; font-weight: bold; }
-            .action-btn { display: block; margin: 5px 0; width: 100%; }
-        }
-    </style>
-    <title>Farmer Requests</title>
-</head>
-<body>
-    <div class="sidebar">
-        <a class="navbar-brand" href="#">
-            <img src="{% static 'images/logo.png' %}" alt="Young4ChickS Logo">
-        </a>
-        <ul class="nav">
-            <li class="nav-item"><a class="nav-link" href="/"><i class="fas fa-home"></i>Home</a></li>
-            <li class="nav-item"><a class="nav-link" href="/managersdashboard/"><i class="fas fa-list"></i>Managers Dash Board</a></li>
-            <li class="nav-item"><a class="nav-link" href="/chickrequests/"><i class="fas fa-list"></i>View Chick Requests</a></li>
-            <li class="nav-item"><a class="nav-link" href="/feedrequests/"><i class="fas fa-list"></i> View Feed Requests</a></li>
-            <li class="nav-item"><a class="nav-link" href="/chickstock/"><i class="fas fa-chick"></i>Chick Stock</a></li>
-            <li class="nav-item"><a class="nav-link" href="/feedstock/"><i class="fas fa-seedling"></i>Feed Stock</a></li>
-            <li class="nav-item"><a class="nav-link" href="/farmerrecords/"><i class="fas fa-users"></i> Farmer Records</a></li>
-            <li class="nav-item"><a class="nav-link" href="/sales/"><i class="fas fa-dollar-sign"></i> Sales</a></li>
-            <li class="nav-item"><a class="nav-link" href="/reports/"><i class="fas fa-chart-bar"></i> Reports</a></li>
-        </ul>
-        <button class="logout-btn" onclick="window.location.href='/logout/'" style="background-color: #d32f2f; color: #fff; border: none; padding: 10px 20px; border-radius: 5px; font-weight: 500; width: 100%; margin-top: 20px; transition: background-color 0.3s ease;">
-            Logout
-        </button>
+{% extends 'base_manager.html' %}
+{% block title %}Farmer Review | Young4ChickS{% endblock %}
+{% block content %}
+<header class="page-header">
+    <h1>Farmer Review</h1>
+</header>
+<div class="table-card fade-in">
+    <h4><i class="fas fa-users"></i> Farmer Requests Overview</h4>
+    <div class="table-responsive">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Farmer ID</th>
+                    <th>Farmer Name</th>
+                    <th>Request ID</th>
+                    <th>Chick Type</th>
+                    <th>Quantity</th>
+                    <th>Status</th>
+                    <th>Request Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for request in requests %}
+                <tr>
+                    <td>{{ request.farmer.farmer_id }}</td>
+                    <td>{{ request.farmer.farmer_name }}</td>
+                    <td>{{ request.chick_request_id }}</td>
+                    <td>{{ request.chick_type|title }}</td>
+                    <td>{{ request.quantity }}</td>
+                    <td><span class="status-badge status-{{ request.status|lower }}">{{ request.status|title }}</span></td>
+                    <td>{{ request.request_date|date:'Y-m-d' }}</td>
+                    <td>
+                        {% if request.status == 'pending' %}
+                        <a href="/approverequest/{{ request.id }}/" class="btn btn-outline btn-small">Review</a>
+                        {% else %}
+                        <span class="text-muted">Reviewed</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="8">No farmer requests available.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
-    <div class="main-content">
-        <div class="container">
-            <div class="farmer-card">
-                <h2>Farmer: {{ farmer.farmer_name }}</h2>
-
-                <!-- Farmer Details Section -->
-                <div class="section-title">Farmer Details</div>
-                <table>
-                    <tr>
-                        <th data-label="Farmer ID">Farmer ID</th>
-                        <td data-label="Farmer ID">{{ farmer.farmer_id }}</td>
-                    </tr>
-                    <tr>
-                        <th data-label="Date of Birth">Date of Birth</th>
-                        <td data-label="Date of Birth">{{ farmer.date_of_birth|date:'Y-m-d' }}</td>
-                    </tr>
-                    <tr>
-                        <th data-label="Age">Age</th>
-                        <td data-label="Age">{{ farmer.age }}</td>
-                    </tr>
-                    <tr>
-                        <th data-label="Gender">Gender</th>
-                        <td data-label="Gender">{{ farmer.get_gender_display }}</td>
-                    </tr>
-                    <tr>
-                        <th data-label="Location">Location</th>
-                        <td data-label="Location">{{ farmer.location }}</td>
-                    </tr>
-                    <tr>
-                        <th data-label="NIN">NIN</th>
-                        <td data-label="NIN">{{ farmer.nin }}</td>
-                    </tr>
-                    <tr>
-                        <th data-label="Phone Number">Phone Number</th>
-                        <td data-label="Phone Number">{{ farmer.phone_number }}</td>
-                    </tr>
-                    <tr>
-                        <th data-label="Recommender Name">Recommender Name</th>
-                        <td data-label="Recommender Name">{{ farmer.recommender_name }}</td>
-                    </tr>
-                    <tr>
-                        <th data-label="Recommender NIN">Recommender NIN</th>
-                        <td data-label="Recommender NIN">{{ farmer.recommender_nin }}</td>
-                    </tr>
-                    <tr>
-                        <th data-label="Recommender Tel">Recommender Tel</th>
-                        <td data-label="Recommender Tel">{{ farmer.recommender_tel }}</td>
-                    </tr>
-                    <tr>
-                        <th data-label="Registered By">Registered By</th>
-                        <td data-label="Registered By">{{ farmer.registered_by }}</td>
-                    </tr>
-                    <tr>
-                        <th data-label="Registration Date">Registration Date</th>
-                        <td data-label="Registration Date">{{ farmer.registration_date|date:'Y-m-d H:i' }}</td>
-                    </tr>
-                </table>
-
-                <!-- Request History Section -->
-                <div class="section-title">Request History</div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th data-label="Request ID">Request ID</th>
-                            <th data-label="Chick Type">Chick Type</th>
-                            <th data-label="Chick Breed">Chick Breed</th>
-                            <th data-label="Quantity">Quantity</th>
-                            <th data-label="Chick Period (days)">Chick Period (days)</th>
-                            <th data-label="Feed Taken">Feed Taken</th>
-                            <th data-label="Payment Terms">Payment Terms</th>
-                            <th data-label="Request Date">Request Date</th>
-                            <th data-label="Status">Status</th>
-                            <th data-label="Approved On">Approved On</th>
-                            <th data-label="Delivered">Delivered</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for request in farmer_requests %}
-                        <tr>
-                            <td data-label="Request ID">{{ request.chick_request_id }}</td>
-                            <td data-label="Chick Type">{{ request.chick_type }}</td>
-                            <td data-label="Chick Breed">{{ request.chick_breed }}</td>
-                            <td data-label="Quantity">{{ request.quantity }}</td>
-                            <td data-label="Chick Period (days)">{{ request.chick_period }}</td>
-                            <td data-label="Feed Taken">{{ request.feed_taken|yesno:"Yes,No" }}</td>
-                            <td data-label="Payment Terms">{{ request.payment_terms }}</td>
-                            <td data-label="Request Date">{{ request.request_date|date:'Y-m-d H:i' }}</td>
-                            <td data-label="Status">{{ request.status }}</td>
-                            <td data-label="Approved On">{{ request.approved_on|date:'Y-m-d H:i'|default:"N/A" }}</td>
-                            <td data-label="Delivered">{{ request.delivered|yesno:"Yes,No" }}</td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="11">No request history available.</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-
-                <!-- Feed and Payment Status Section -->
-                <div class="section-title">Feed and Payment Status</div>
-                <p><strong>Feed Taken:</strong> {{ farmer_feed_status.feed_taken|yesno:"Yes,No" }}</p>
-                <p><strong>Payment Status:</strong> {{ farmer_feed_status.payment_status|default:"N/A" }}</p>
-
-                <!-- Action Buttons for Current Request -->
-                <div class="section-title">Request Actions</div>
-                {% if current_request and current_request.status == 'pending' %}
-                <form method="post" style="margin-top: 10px;">
-                    {% csrf_token %}
-                    <input type="hidden" name="request_id" value="{{ current_request.id }}">
-                    <button type="submit" name="action" value="approve" class="action-btn approve-btn">Approve Request</button>
-                    <button type="submit" name="action" value="reject" class="action-btn reject-btn">Reject Request</button>
-                </form>
-                {% else %}
-                <p>No pending request to approve or reject.</p>
-                {% endif %}
-            </div>
-        </div>
-    </div>
-    <footer>
-        <div class="container">          
-            <hr>
-            <p>&copy; 2025 Young4ChickS. All rights reserved. | Designed by Nafuna Anitah Soniah</p>
-        </div>
-    </footer>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.9.2/umd/popper.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.min.js"></script>
-</body>
-</html>
+</div>
+{% endblock %}

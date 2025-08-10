@@ -1,165 +1,65 @@
-<!-- view sales, feeds, expired feeds, chicks stock, sales agent performance-->
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <meta name="Description" content="Enter your description here" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <link rel="stylesheet" href="assets/css/style.css">
-    <style>
-        body {
-            background-color: #f8f9fa;
-            font-family: 'Arial', sans-serif;
-            color: #333;
-            margin: 0;
-            padding: 0;
-            display: flex;
-        }
-
-        .sidebar {
-            width: 250px;
-            background-color: #6a0dad;
-            position: fixed;
-            height: 100%;
-            padding-top: 20px;
-            box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .sidebar .navbar-brand {
-            padding: 10px 20px;
-            margin-bottom: 20px;
-        }
-
-        .sidebar .navbar-brand img {
-            height: 40px;
-        }
-
-        .sidebar .nav {
-            flex-direction: column;
-            padding: 0 20px;
-        }
-
-        .sidebar .nav-link {
-            color: #fff;
-            font-weight: 500;
-            padding: 10px 15px;
-            margin-bottom: 10px;
-            border-radius: 5px;
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
-
-        .sidebar .nav-link:hover {
-            color: #b266ff;
-            background-color: rgba(255, 255, 255, 0.1);
-        }
-
-        .main-content {
-            margin-left: 250px;
-            width: calc(100% - 250px);
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin-top: 20px;
-        }
-
-        .summary-card {
-            background: #fff;
-            border: 1px solid #b266ff;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-
-        .summary-card h4 {
-            color: #6a0dad;
-            font-size: 1.2rem;
-        }
-
-        @media (max-width: 768px) {
-            .sidebar {
-                width: 200px;
-            }
-
-            .main-content {
-                margin-left: 200px;
-                width: calc(100% - 200px);
-            }
-        }
-
-        @media (max-width: 576px) {
-            .sidebar {
-                width: 100%;
-                height: auto;
-                position: relative;
-            }
-
-            .main-content {
-                margin-left: 0;
-                width: 100%;
-            }
-
-            .sidebar .nav-link {
-                display: inline-block;
-                margin-right: 10px;
-                margin-bottom: 5px;
-            }
-        }
-    </style>
-    <title>Reports</title>
-</head>
-
-<body>
-    <div class="sidebar">
-        <a class="navbar-brand" href="#">
-            <img src="{% static 'images/logo.png' %}" alt="Young4ChickS Logo">
-        </a>
-        <ul class="nav">
-             <li class="nav-item"><a class="nav-link" href="/"><i class="fas fa-home"></i>Home</a></li>
-            <li class="nav-item"><a class="nav-link" href="/managersdashboard/"><i class="fas fa-list"></i>Managers Dash Board</a></li>
-            <li class="nav-item"><a class="nav-link" href="/chickrequests/"><i class="fas fa-list"></i> View Chick Requests</a></li>
-            <li class="nav-item"><a class="nav-link" href="/feedrequests/"><i class="fas fa-list"></i> View Feed Requests</a></li>
-            <li class="nav-item"><a class="nav-link" href="/chickstock/"><i class="fas fa-chick"></i> Chick Stock</a></li>
-            <li class="nav-item"><a class="nav-link" href="/feedstock/"><i class="fas fa-seedling"></i>Feed Stock</a></li>
-            <li class="nav-item"><a class="nav-link" href="/farmerrecords/"><i class="fas fa-users"></i>Farmer Records</a></li>
-            <li class="nav-item"><a class="nav-link" href="/sales/"><i class="fas fa-dollar-sign"></i>Sales</a></li>
-            <li class="nav-item"><a class="nav-link" href="/reports/"><i class="fas fa-chart-bar"></i>Reports</a></li>
-        </ul>
+{% extends 'base_manager.html' %}
+{% block title %}Reports | Young4ChickS{% endblock %}
+{% block content %}
+<header class="page-header">
+    <h1>Reports</h1>
+</header>
+<div class="card-grid">
+    <div class="card fade-in">
+        <h4><i class="fas fa-chart-line"></i> Sales Overview</h4>
+        <div class="metric">{{ total_sales|default:"0" }}</div>
+        <small>Total Sales</small>
     </div>
-    <div class="main-content">
-        <div class="container">
-            <h2 class="mb-4">Reports</h2>
-            <div class="summary-card">
-                <h4>Total Requests</h4>
-                <p>Placeholder: 25 Requests</p>
-            </div>
-            <div class="summary-card">
-                <h4>Total Sales</h4>
-                <p>Placeholder: 10 Sales</p>
-            </div>
-            <div class="summary-card">
-                <h4>Chicks Delivered</h4>
-                <p>Deliveries made: 4 Allocations</p>
-                <p>Pending Deliveries:3</p>
-            </div>
-            <div class="summary-card">
-                <h4>Feed Allocations</h4>
-                <p>Farmers that have taken feeds: 4 </p>
-                <p>Farmers that have paid: 2 </p>
-                <p>Pending payments: 2</p>
-            </div>
-
-        </div>
+    <div class="card fade-in">
+        <h4><i class="fas fa-egg"></i> Chick Requests</h4>
+        <div class="metric">{{ total_chick_requests|default:"0" }}</div>
+        <small>Total Requests</small>
     </div>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.9.2/umd/popper.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.min.js"></script>
-</body>
+    <div class="card fade-in">
+        <h4><i class="fas fa-seedling"></i> Feed Allocations</h4>
+        <div class="metric">{{ total_feed_allocations|default:"0" }}</div>
+        <small>Total Allocations</small>
+    </div>
+    <div class="card fade-in">
+        <h4><i class="fas fa-users"></i> Farmers</h4>
+        <div class="metric">{{ total_farmers|default:"0" }}</div>
+        <small>Registered Farmers</small>
+    </div>
+</div>
 
-</html>
+<div class="table-card fade-in">
+    <h4><i class="fas fa-chart-bar"></i> Recent Activity</h4>
+    <div class="table-responsive">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Type</th>
+                    <th>Count</th>
+                    <th>Status</th>
+                    <th>Last Updated</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Chick Requests</td>
+                    <td>{{ pending_chick_requests|default:"0" }}</td>
+                    <td><span class="status-badge status-pending">Pending</span></td>
+                    <td>{{ last_chick_request_date|default:"N/A" }}</td>
+                </tr>
+                <tr>
+                    <td>Feed Allocations</td>
+                    <td>{{ pending_feed_payments|default:"0" }}</td>
+                    <td><span class="status-badge status-pending">Payment Pending</span></td>
+                    <td>{{ last_feed_allocation_date|default:"N/A" }}</td>
+                </tr>
+                <tr>
+                    <td>Stock Levels</td>
+                    <td>{{ low_stock_items|default:"0" }}</td>
+                    <td><span class="status-badge status-warning">Low Stock</span></td>
+                    <td>{{ last_stock_update|default:"N/A" }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

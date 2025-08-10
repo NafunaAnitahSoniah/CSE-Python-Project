@@ -121,7 +121,8 @@ def ViewFeedRequests(request):
 
 @role_required('manager')
 def FarmerReview(request):
-    return render(request, 'farmerReview.html')
+    requests = ChickRequest.objects.select_related('farmer').order_by('-request_date')
+    return render(request, 'farmerReview.html', {'requests': requests})
 
 @role_required('manager')
 def Approverequest(request):
@@ -233,11 +234,44 @@ def UpdateFeedStock(request):
 
 @role_required('manager')
 def Reports(request):
-    return render(request, 'reports.html')
+    # Get various statistics for the reports page
+    total_sales = Sale.objects.count()
+    total_chick_requests = ChickRequest.objects.count()
+    total_feed_allocations = FeedAllocation.objects.count()
+    total_farmers = Customer.objects.count()
+    
+    # Get pending items
+    pending_chick_requests = ChickRequest.objects.filter(status='pending').count()
+    pending_feed_payments = FeedAllocation.objects.filter(payment_status='pending').count()
+    
+    # Get low stock items (less than 100 chicks or 50 bags of feed)
+    low_stock_chicks = ChickStock.objects.filter(stock_quantity__lt=100).count()
+    low_stock_feeds = FeedStock.objects.filter(feed_quantity__lt=50).count()
+    low_stock_items = low_stock_chicks + low_stock_feeds
+    
+    # Get latest dates
+    last_chick_request = ChickRequest.objects.order_by('-request_date').first()
+    last_feed_allocation = FeedAllocation.objects.order_by('-id').first()
+    last_stock_update = ChickStock.objects.order_by('-updated_at').first()
+    
+    context = {
+        'total_sales': total_sales,
+        'total_chick_requests': total_chick_requests,
+        'total_feed_allocations': total_feed_allocations,
+        'total_farmers': total_farmers,
+        'pending_chick_requests': pending_chick_requests,
+        'pending_feed_payments': pending_feed_payments,
+        'low_stock_items': low_stock_items,
+        'last_chick_request_date': last_chick_request.request_date.date() if last_chick_request else None,
+        'last_feed_allocation_date': last_feed_allocation.id if last_feed_allocation else None,
+        'last_stock_update': last_stock_update.updated_at.date() if last_stock_update else None,
+    }
+    return render(request, 'reports.html', context)
 
 @role_required('manager')
 def Sales(request):
-    return render(request, 'sales.html')
+    sales = Sale.objects.select_related('chick_request__farmer', 'recorded_by').order_by('-created_at')
+    return render(request, 'sales.html', {'sales': sales})
 
 
 
@@ -298,10 +332,62 @@ def AddChickRequest(request):
 
 @role_required('sales_agent')
 def AddFeedRequest(request):
-    return render(request, '1addFeedRequest.html')
+    # Need chick requests belonging to this agent (approved or pending?) Use own requests
+    chick_requests = ChickRequest.objects.filter(created_by=request.user)
+    if request.method == 'POST':
+        try:
+            feed_allocation = FeedAllocation(
+                feed_request_id=request.POST.get('feed_request_id'),
+                feed_name=request.POST.get('feed_name') or request.POST.get('feed_type'),
+                feed_type=request.POST.get('feed_type'),
+                feed_brand=request.POST.get('feed_brand'),
+                chick_request=get_object_or_404(ChickRequest, id=request.POST.get('chick_request')),
+                bags_allocated=request.POST.get('bags_allocated') or 0,
+                amount_due=request.POST.get('amount_due') or 0,
+                payment_due_date=request.POST.get('payment_due_date') or None,
+                payment_status=request.POST.get('payment_status') or 'pending'
+            )
+            feed_allocation.full_clean()
+            feed_allocation.save()
+            messages.success(request, 'Feed request submitted successfully!')
+            return redirect('salesagentdashboard')
+        except Exception as e:
+            messages.error(request, str(e))
+    return render(request, '1addFeedRequest.html', {'chick_requests': chick_requests})
 
 @role_required('sales_agent')
 def RegisterFarmer(request):
+    if request.method == 'POST':
+        # basic creation of user+customer
+        try:
+            username = request.POST.get('farmer_id')
+            # create user profile with farmer role
+            user = UserProfile.objects.create_user(
+                username=username,
+                password=username,  # initial password (could be improved)
+                role='farmer'
+            )
+            customer = Customer(
+                user=user,
+                farmer_id=request.POST.get('farmer_id'),
+                farmer_name=request.POST.get('farmer_name'),
+                date_of_birth=request.POST.get('date_of_birth'),
+                age=request.POST.get('age') or 0,
+                gender=request.POST.get('gender'),
+                location=request.POST.get('location'),
+                nin=request.POST.get('nin'),
+                phone_number=request.POST.get('phone_number'),
+                recommender_name=request.POST.get('recommender_name'),
+                recommender_nin=request.POST.get('recommender_nin'),
+                recommender_tel=request.POST.get('recommender_tel'),
+                registered_by=request.user.username
+            )
+            customer.full_clean()
+            customer.save()
+            messages.success(request, 'Farmer registered successfully!')
+            return redirect('salesagentdashboard')
+        except Exception as e:
+            messages.error(request, str(e))
     return render(request, '1registerfarmer.html')
 
 # duplicate duplicate definitions removed above

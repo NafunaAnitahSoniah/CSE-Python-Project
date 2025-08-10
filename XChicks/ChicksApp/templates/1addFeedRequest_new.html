@@ -11,15 +11,11 @@
         {% csrf_token %}
         <div class="form-group">
             <label for="feed_request_id">Feed Request ID:</label>
-            <input class="form-control" type="text" name="feed_request_id" id="feed_request_id" maxlength="15" required>
-        </div>
-        <div class="form-group">
-            <label for="feed_name">Feed Name:</label>
-            <input class="form-control" type="text" name="feed_name" id="feed_name" maxlength="25" required>
+            <input type="text" name="feed_request_id" id="feed_request_id" maxlength="15" required>
         </div>
         <div class="form-group">
             <label for="feed_type">Feed Type:</label>
-            <select class="form-control" name="feed_type" id="feed_type" required>
+            <select name="feed_type" id="feed_type" required>
                 <option value="">Select Type</option>
                 <option value="starter">Starter</option>
                 <option value="grower">Grower</option>
@@ -30,11 +26,11 @@
         </div>
         <div class="form-group">
             <label for="feed_brand">Feed Brand:</label>
-            <input class="form-control" type="text" name="feed_brand" id="feed_brand" maxlength="25" required>
+            <input type="text" name="feed_brand" id="feed_brand" maxlength="25" required>
         </div>
         <div class="form-group">
             <label for="chick_request">Chick Request:</label>
-            <select class="form-control" name="chick_request" id="chick_request" required>
+            <select name="chick_request" id="chick_request" required>
                 <option value="">Select Chick Request</option>
                 {% for request in chick_requests %}
                 <option value="{{ request.id }}">{{ request.chick_request_id }} (Farmer: {{ request.farmer.farmer_name }})</option>
@@ -43,19 +39,19 @@
         </div>
         <div class="form-group">
             <label for="bags_allocated">Bags Allocated:</label>
-            <input class="form-control" type="number" name="bags_allocated" id="bags_allocated" min="1" required>
+            <input type="number" name="bags_allocated" id="bags_allocated" min="1" required>
         </div>
         <div class="form-group">
             <label for="amount_due">Amount Due (UgSh):</label>
-            <input class="form-control" type="number" name="amount_due" id="amount_due" min="0" required>
+            <input type="number" name="amount_due" id="amount_due" min="0" required>
         </div>
         <div class="form-group">
             <label for="payment_due_date">Payment Due Date:</label>
-            <input class="form-control" type="date" name="payment_due_date" id="payment_due_date" required>
+            <input type="date" name="payment_due_date" id="payment_due_date" required>
         </div>
         <div class="form-group">
             <label for="payment_status">Payment Status:</label>
-            <select class="form-control" name="payment_status" id="payment_status" required>
+            <select name="payment_status" id="payment_status" required>
                 <option value="">Select Status</option>
                 <option value="pending">Pending</option>
                 <option value="paid">Paid</option>

@@ -1,147 +1,44 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <meta name="Description" content="Enter your description here"/>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <link rel="stylesheet" href="assets/css/style.css">
-    <style>
-        body {
-            background-color: #f8f9fa;
-            font-family: 'Arial', sans-serif;
-            color: #333;
-            margin: 0;
-            padding: 0;
-            display: flex;
-        }
-        .sidebar {
-            width: 250px;
-            background-color: #6a0dad;
-            position: fixed;
-            height: 100%;
-            padding-top: 20px;
-            box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
-        }
-        .sidebar .navbar-brand {
-            padding: 10px 20px;
-            margin-bottom: 20px;
-        }
-        .sidebar .navbar-brand img {
-            height: 40px;
-        }
-        .sidebar .nav {
-            flex-direction: column;
-            padding: 0 20px;
-        }
-        .sidebar .nav-link {
-            color: #fff;
-            font-weight: 500;
-            padding: 10px 15px;
-            margin-bottom: 10px;
-            border-radius: 5px;
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
-        .sidebar .nav-link:hover {
-            color: #b266ff;
-            background-color: rgba(255, 255, 255, 0.1);
-        }
-        .main-content {
-            margin-left: 250px;
-            width: calc(100% - 250px);
-            padding: 20px;
-        }
-        .container {
-            max-width: 1200px;
-            margin-top: 20px;
-        }
-        .masonry-grid {
-            column-count: 3;
-            column-gap: 20px;
-            padding: 20px;
-        }
-        .masonry-item {
-            display: inline-block;
-            width: 100%;
-            margin-bottom: 20px;
-            background: #fff;
-            border: 1px solid #b266ff;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease;
-        }
-        .masonry-item:hover {
-            transform: translateY(-5px);
-        }
-        .masonry-item-content {
-            padding: 15px;
-        }
-        .masonry-item h5 {
-            color: #6a0dad;
-            font-size: 1.2rem;
-        }
-        .masonry-item p {
-            margin: 5px 0;
-        }
-        @media (max-width: 768px) {
-            .sidebar { width: 200px; }
-            .main-content { margin-left: 200px; width: calc(100% - 200px); }
-            .masonry-grid { column-count: 2; }
-            .container { padding: 10px; }
-        }
-        @media (max-width: 576px) {
-            .sidebar { width: 100%; height: auto; position: relative; }
-            .main-content { margin-left: 0; width: 100%; }
-            .masonry-grid { column-count: 1; }
-            .sidebar .nav-link { display: inline-block; margin-right: 10px; margin-bottom: 5px; }
-        }
-    </style>
-    <title>Sales</title>
-</head>
-<body>
-    <div class="sidebar">
-        <a class="navbar-brand" href="#">
-            <img src="{% static 'images/logo.png' %}" alt="Young4ChickS Logo">
-        </a>
-        <ul class="nav">
-            <li class="nav-item"><a class="nav-link" href="/"><i class="fas fa-home"></i>Home</a></li>
-            <li class="nav-item"><a class="nav-link" href="/managersdashboard/"><i class="fas fa-list"></i>Managers Dash Board</a></li>
-            <li class="nav-item"><a class="nav-link" href="/chickrequests/"><i class="fas fa-list"></i> View Chick Requests</a></li>
-            <li class="nav-item"><a class="nav-link" href="/feedrequests/"><i class="fas fa-list"></i> View Feed Requests</a></li>
-            <li class="nav-item"><a class="nav-link" href="/chickstock/"><i class="fas fa-chick"></i> Chick Stock</a></li>
-            <li class="nav-item"><a class="nav-link" href="/feedstock/"><i class="fas fa-seedling"></i>Feed Stock</a></li>
-            <li class="nav-item"><a class="nav-link" href="/farmerrecords/"><i class="fas fa-users"></i>Farmer Records</a></li>
-            <li class="nav-item"><a class="nav-link" href="/sales/"><i class="fas fa-dollar-sign"></i>Sales</a></li>
-            <li class="nav-item"><a class="nav-link" href="/reports/"><i class="fas fa-chart-bar"></i>Reports</a></li>
-        </ul>
+{% extends 'base_manager.html' %}
+{% block title %}Sales | Young4ChickS{% endblock %}
+{% block content %}
+<header class="page-header">
+    <h1>Sales</h1>
+</header>
+<div class="table-card fade-in">
+    <h4><i class="fas fa-sack-dollar"></i> Overview</h4>
+    <div class="table-responsive">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Sale ID</th>
+                    <th>Request ID</th>
+                    <th>Farmer Name</th>
+                    <th>Chick Type</th>
+                    <th>Quantity</th>
+                    <th>Total Amount (UgSh)</th>
+                    <th>Date</th>
+                    <th>Recorded By</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for sale in sales %}
+                <tr>
+                    <td>{{ sale.sale_id }}</td>
+                    <td>{{ sale.chick_request.chick_request_id }}</td>
+                    <td>{{ sale.chick_request.farmer.farmer_name }}</td>
+                    <td>{{ sale.chick_request.chick_type|title }}</td>
+                    <td>{{ sale.chick_request.quantity }}</td>
+                    <td>{{ sale.total_amount|floatformat:0 }}</td>
+                    <td>{{ sale.created_at|date:'Y-m-d' }}</td>
+                    <td>{{ sale.recorded_by.get_full_name|default:sale.recorded_by.username }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="8">No sales records available.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
-    <div class="main-content">
-        <div class="container">
-            <h2 class="mb-4">Sales</h2>
-            <div class="masonry-grid">
-                <div class="masonry-item">
-                    <div class="masonry-item-content">
-                        <h5>Sale #001</h5>
-                        <p><strong>Request ID:</strong> R202501010001</p>
-                        <p><strong>Total Amount:</strong> 330,000 UgSh</p>
-                        <p><strong>Date:</strong> 2025-08-01</p>
-                    </div>
-                </div>
-                <div class="masonry-item">
-                    <div class="masonry-item-content">
-                        <h5>Sale #002</h5>
-                        <p><strong>Request ID:</strong> R202501010002</p>
-                        <p><strong>Total Amount:</strong> 495,000 UgSh</p>
-                        <p><strong>Date:</strong> 2025-08-02</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.9.2/umd/popper.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.1.0/js/bootstrap.min.js"></script>
-</body>
-</html>
+</div>
+{% endblock %}

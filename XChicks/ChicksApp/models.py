@@ -8,7 +8,7 @@ from django.core.exceptions import ValidationError
 
 class UserProfile(AbstractUser): #abstract user is the model that helps us store a superadmin
     ROLE_CHOICES = (
-        #('farmer', 'Farmer'),
+        ('farmer', 'farmer'),
         ('sales_agent', 'sales_agent'),
         ('manager', 'manager'),
     )
