@@ -10,10 +10,6 @@
     <form method="post" class="form-grid">
         {% csrf_token %}
         <div class="form-group">
-            <label for="farmer_id">Farmer ID:</label>
-            <input class="form-control" type="text" name="farmer_id" id="farmer_id" maxlength="15" required>
-        </div>
-        <div class="form-group">
             <label for="farmer_name">Farmer Name:</label>
             <input class="form-control" type="text" name="farmer_name" id="farmer_name" maxlength="50" required>
         </div>
@@ -29,65 +25,29 @@
                 <option value="F">Female</option>
             </select>
         </div>
-            <div class="form-group">
-                <label for="age">Age:</label>
-                <input class="form-control" type="number" name="age" id="age" min="20" max="30" required>
-            </div>
-            <div class="form-group">
-                <label for="location">Location:</label>
-                <input class="form-control" type="text" name="location" id="location" maxlength="30" required>
-            </div>
-            <div class="form-group">
-                <label for="nin">NIN:</label>
-                <input class="form-control" type="text" name="nin" id="nin" maxlength="14" pattern="[A-Z0-9]{14}" required placeholder="14 alphanumeric characters">
-            </div>
-            <div class="form-group">
-                <label for="phone_number">Phone Number:</label>
-                <input class="form-control" type="text" name="phone_number" id="phone_number" maxlength="15" required>
-            </div>
-            <div class="form-group">
-                <label for="recommender_name">Recommender Name:</label>
-                <input class="form-control" type="text" name="recommender_name" id="recommender_name" maxlength="50" required>
-            </div>
-            <div class="form-group">
-                <label for="recommender_nin">Recommender NIN:</label>
-                <input class="form-control" type="text" name="recommender_nin" id="recommender_nin" maxlength="14" required>
-            </div>
-            <div class="form-group">
-                <label for="recommender_tel">Recommender Tel:</label>
-                <input class="form-control" type="text" name="recommender_tel" id="recommender_tel" maxlength="15" required>
-            </div>
         <div class="form-group">
-            <label for="district">District:</label>
-            <input class="form-control" type="text" name="district" id="district" maxlength="50" required>
+            <label for="location">Location:</label>
+            <input class="form-control" type="text" name="location" id="location" maxlength="30" required>
         </div>
         <div class="form-group">
-            <label for="sub_county">Sub County:</label>
-            <input class="form-control" type="text" name="sub_county" id="sub_county" maxlength="50" required>
+            <label for="nin">NIN:</label>
+            <input class="form-control" type="text" name="nin" id="nin" maxlength="14" pattern="[A-Z0-9]{14}" required placeholder="14 alphanumeric characters">
         </div>
         <div class="form-group">
-            <label for="parish">Parish:</label>
-            <input class="form-control" type="text" name="parish" id="parish" maxlength="50" required>
+            <label for="phone_number">Phone Number:</label>
+            <input class="form-control" type="text" name="phone_number" id="phone_number" maxlength="15" required>
         </div>
         <div class="form-group">
-            <label for="village">Village:</label>
-            <input class="form-control" type="text" name="village" id="village" maxlength="50" required>
+            <label for="recommender_name">Recommender Name:</label>
+            <input class="form-control" type="text" name="recommender_name" id="recommender_name" maxlength="50" required>
         </div>
         <div class="form-group">
-            <label for="phone">Phone:</label>
-            <input class="form-control" type="tel" name="phone" id="phone" maxlength="15" required>
+            <label for="recommender_nin">Recommender NIN:</label>
+            <input class="form-control" type="text" name="recommender_nin" id="recommender_nin" maxlength="14" required>
         </div>
         <div class="form-group">
-            <label for="email">Email (Optional):</label>
-            <input class="form-control" type="email" name="email" id="email" maxlength="100">
-        </div>
-        <div class="form-group">
-            <label for="land_size">Land Size (acres):</label>
-            <input class="form-control" type="number" name="land_size" id="land_size" step="0.01" min="0" required>
-        </div>
-        <div class="form-group">
-            <label for="farming_experience">Farming Experience (years):</label>
-            <input class="form-control" type="number" name="farming_experience" id="farming_experience" min="0" required>
+            <label for="recommender_tel">Recommender Tel:</label>
+            <input class="form-control" type="text" name="recommender_tel" id="recommender_tel" maxlength="15" required>
         </div>
         <div class="form-actions">
             <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Register Farmer</button>

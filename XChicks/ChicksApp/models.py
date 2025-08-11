@@ -5,6 +5,7 @@ from django.utils import timezone
 from datetime import timedelta
 from django.conf import settings
 from django.core.exceptions import ValidationError
+import uuid
 
 class UserProfile(AbstractUser): #abstract user is the model that helps us store a superadmin
     ROLE_CHOICES = (
@@ -69,10 +70,11 @@ class FeedStock(models.Model):
 
 class Customer(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    farmer_id = models.CharField(max_length=15, unique=True)
+    farmer_id = models.CharField(max_length=15, unique=True, blank=True)
     farmer_name = models.CharField(max_length=50)
     date_of_birth = models.DateField()
-    age = models.PositiveIntegerField(validators=[MinValueValidator(20), MaxValueValidator(30)])
+    # Age is now auto-calculated from date_of_birth; validators removed to allow any resulting age
+    age = models.PositiveIntegerField(null=True, blank=True)
     gender = models.CharField(max_length=10, choices=[('M', 'Male'), ('F', 'Female')])
     location = models.CharField(max_length=30)
     nin = models.CharField(
@@ -90,12 +92,40 @@ class Customer(models.Model):
     def __str__(self):
         return self.farmer_id
 
+    def save(self, *args, **kwargs):
+        # Auto-generate farmer_id if not provided
+        if not self.farmer_id:
+            # Generate a unique farmer ID with format FARMER-YYYY-XXXX
+            year = timezone.now().year
+            last_farmer = Customer.objects.filter(farmer_id__startswith=f'FARMER-{year}').order_by('-farmer_id').first()
+            if last_farmer:
+                try:
+                    last_number = int(last_farmer.farmer_id.split('-')[-1])
+                    new_number = last_number + 1
+                except (ValueError, IndexError):
+                    new_number = 1
+            else:
+                new_number = 1
+            self.farmer_id = f'FARMER-{year}-{new_number:04d}'
+        
+        # Auto-calculate age from date_of_birth
+        if self.date_of_birth:
+            today = timezone.now().date()
+            calculated_age = today.year - self.date_of_birth.year - (
+                (today.month, today.day) < (self.date_of_birth.month, self.date_of_birth.day)
+            )
+            self.age = calculated_age if calculated_age >= 0 else 0
+        
+        super().save(*args, **kwargs)
+
     def clean(self):
-        # Ensure age matches date_of_birth
-        today = timezone.now().date()
-        calculated_age = today.year - self.date_of_birth.year - ((today.month, today.day) < (self.date_of_birth.month, self.date_of_birth.day))
-        if calculated_age != self.age:
-            raise ValidationError('Age does not match date of birth.')
+        # Auto-sync age with date_of_birth (no validation error if it differs)
+        if self.date_of_birth:
+            today = timezone.now().date()
+            calculated_age = today.year - self.date_of_birth.year - (
+                (today.month, today.day) < (self.date_of_birth.month, self.date_of_birth.day)
+            )
+            self.age = calculated_age if calculated_age >= 0 else 0
 
 class ChickRequest(models.Model):
     STATUS_CHOICES = (
@@ -105,7 +135,7 @@ class ChickRequest(models.Model):
         ('completed', 'Completed'),
     )
     farmer = models.ForeignKey(Customer, on_delete=models.CASCADE)
-    chick_request_id = models.CharField(max_length=15, unique=True)
+    chick_request_id = models.CharField(max_length=15, unique=True, blank=True)
     farmer_type = models.CharField(max_length=10, choices=[('starter', 'Starter'), ('returning', 'Returning')])
     chick_type = models.CharField(max_length=15, choices=[('layer', 'Layer'), ('broiler', 'Broiler')])
     chick_breed = models.CharField(max_length=15, choices=[('local', 'Local'), ('exotic', 'Exotic')])
@@ -126,6 +156,24 @@ class ChickRequest(models.Model):
     def __str__(self):
         return self.chick_request_id
 
+    def save(self, *args, **kwargs):
+        # Auto-generate chick_request_id if not provided
+        if not self.chick_request_id:
+            # Generate a unique request ID with format REQ-YYYY-XXXX
+            year = timezone.now().year
+            last_request = ChickRequest.objects.filter(chick_request_id__startswith=f'REQ-{year}').order_by('-chick_request_id').first()
+            if last_request:
+                try:
+                    last_number = int(last_request.chick_request_id.split('-')[-1])
+                    new_number = last_number + 1
+                except (ValueError, IndexError):
+                    new_number = 1
+            else:
+                new_number = 1
+            self.chick_request_id = f'REQ-{year}-{new_number:04d}'
+        
+        super().save(*args, **kwargs)
+
     def clean(self):
         # Validate quantity based on farmer type
         if self.farmer_type == 'starter' and self.quantity != 100:
@@ -142,7 +190,7 @@ class ChickRequest(models.Model):
             raise ValidationError('You can only submit a request every 4 months.')
 
 class FeedAllocation(models.Model):
-    feed_request_id = models.CharField(max_length=15, unique=True)
+    feed_request_id = models.CharField(max_length=15, unique=True, blank=True)
     feed_name = models.CharField(max_length=25)
     feed_type = models.CharField(max_length=25)
     feed_brand = models.CharField(max_length=25)
@@ -160,6 +208,21 @@ class FeedAllocation(models.Model):
         return self.feed_request_id
 
     def save(self, *args, **kwargs):
+        # Auto-generate feed_request_id if not provided
+        if not self.feed_request_id:
+            # Generate a unique feed request ID with format FEED-YYYY-XXXX
+            year = timezone.now().year
+            last_feed = FeedAllocation.objects.filter(feed_request_id__startswith=f'FEED-{year}').order_by('-feed_request_id').first()
+            if last_feed:
+                try:
+                    last_number = int(last_feed.feed_request_id.split('-')[-1])
+                    new_number = last_number + 1
+                except (ValueError, IndexError):
+                    new_number = 1
+            else:
+                new_number = 1
+            self.feed_request_id = f'FEED-{year}-{new_number:04d}'
+        
         # Auto-set payment_due_date to 2 months from now
         if not self.payment_due_date:
             self.payment_due_date = timezone.now().date() + timedelta(days=60)

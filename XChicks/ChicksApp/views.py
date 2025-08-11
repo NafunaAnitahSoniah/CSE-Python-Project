@@ -303,76 +303,25 @@ def SalesAgentdashboard(request):
     return render(request, '1salesAgentdashboard.html', context)
 
 @role_required('sales_agent')
-def AddChickRequest(request):
-    if request.method == 'POST':
-        farmer_id = request.POST.get('farmer')
-        farmer = get_object_or_404(Customer, id=farmer_id)
-        chick_request = ChickRequest(
-            farmer=farmer,
-            chick_request_id=request.POST.get('chick_request_id'),
-            farmer_type=request.POST.get('farmer_type'),
-            chick_type=request.POST.get('chick_type'),
-            chick_breed=request.POST.get('chick_breed'),
-            quantity=request.POST.get('quantity'),
-            chick_period=request.POST.get('chick_period'),
-            feed_taken=request.POST.get('feed_taken') == 'True',
-            payment_terms=request.POST.get('payment_terms'),
-            received_through=request.POST.get('received_through'),
-            created_by=request.user
-        )
-        try:
-            chick_request.full_clean()
-            chick_request.save()
-            messages.success(request, 'Chick request submitted successfully!')
-            return redirect('salesagentdashboard')
-        except Exception as e:
-            messages.error(request, str(e))
-    farmers = Customer.objects.all()
-    return render(request, '1addChickRequests.html', {'farmers': farmers})
-
-@role_required('sales_agent')
-def AddFeedRequest(request):
-    # Need chick requests belonging to this agent (approved or pending?) Use own requests
-    chick_requests = ChickRequest.objects.filter(created_by=request.user)
-    if request.method == 'POST':
-        try:
-            feed_allocation = FeedAllocation(
-                feed_request_id=request.POST.get('feed_request_id'),
-                feed_name=request.POST.get('feed_name') or request.POST.get('feed_type'),
-                feed_type=request.POST.get('feed_type'),
-                feed_brand=request.POST.get('feed_brand'),
-                chick_request=get_object_or_404(ChickRequest, id=request.POST.get('chick_request')),
-                bags_allocated=request.POST.get('bags_allocated') or 0,
-                amount_due=request.POST.get('amount_due') or 0,
-                payment_due_date=request.POST.get('payment_due_date') or None,
-                payment_status=request.POST.get('payment_status') or 'pending'
-            )
-            feed_allocation.full_clean()
-            feed_allocation.save()
-            messages.success(request, 'Feed request submitted successfully!')
-            return redirect('salesagentdashboard')
-        except Exception as e:
-            messages.error(request, str(e))
-    return render(request, '1addFeedRequest.html', {'chick_requests': chick_requests})
-
-@role_required('sales_agent')
 def RegisterFarmer(request):
     if request.method == 'POST':
-        # basic creation of user+customer
         try:
-            username = request.POST.get('farmer_id')
-            # create user profile with farmer role
+            # Generate a unique username for the farmer
+            import uuid
+            username = f"farmer_{uuid.uuid4().hex[:8]}"
+            
+            # Create user profile with farmer role
             user = UserProfile.objects.create_user(
                 username=username,
                 password=username,  # initial password (could be improved)
                 role='farmer'
             )
+            
+            # Create customer record (farmer_id will be auto-generated)
             customer = Customer(
                 user=user,
-                farmer_id=request.POST.get('farmer_id'),
                 farmer_name=request.POST.get('farmer_name'),
                 date_of_birth=request.POST.get('date_of_birth'),
-                age=request.POST.get('age') or 0,
                 gender=request.POST.get('gender'),
                 location=request.POST.get('location'),
                 nin=request.POST.get('nin'),
@@ -384,13 +333,67 @@ def RegisterFarmer(request):
             )
             customer.full_clean()
             customer.save()
-            messages.success(request, 'Farmer registered successfully!')
+            messages.success(request, f'Farmer registered successfully! Farmer ID: {customer.farmer_id}')
             return redirect('salesagentdashboard')
         except Exception as e:
             messages.error(request, str(e))
     return render(request, '1registerfarmer.html')
 
-# duplicate duplicate definitions removed above
+@role_required('sales_agent')
+def AddChickRequest(request):
+    if request.method == 'POST':
+        try:
+            farmer_id = request.POST.get('farmer')
+            farmer = get_object_or_404(Customer, id=farmer_id)
+            
+            chick_request = ChickRequest(
+                farmer=farmer,
+                farmer_type=request.POST.get('farmer_type'),
+                chick_type=request.POST.get('chick_type'),
+                chick_breed=request.POST.get('chick_breed'),
+                quantity=request.POST.get('quantity'),
+                chick_period=request.POST.get('chick_period'),
+                feed_taken=request.POST.get('feed_taken') == 'True',
+                payment_terms=request.POST.get('payment_terms'),
+                received_through=request.POST.get('received_through'),
+                created_by=request.user
+            )
+            chick_request.full_clean()
+            chick_request.save()
+            messages.success(request, f'Chick request submitted successfully! Request ID: {chick_request.chick_request_id}')
+            return redirect('salesagentdashboard')
+        except Exception as e:
+            messages.error(request, str(e))
+    
+    # Get all farmers for the dropdown
+    farmers = Customer.objects.all().order_by('farmer_name')
+    return render(request, '1addChickRequests.html', {'farmers': farmers})
+
+@role_required('sales_agent')
+def AddFeedRequest(request):
+    # Get chick requests belonging to this agent (approved or pending)
+    chick_requests = ChickRequest.objects.filter(created_by=request.user, status__in=['approved', 'pending']).select_related('farmer')
+    
+    if request.method == 'POST':
+        try:
+            feed_allocation = FeedAllocation(
+                feed_name=request.POST.get('feed_name'),
+                feed_type=request.POST.get('feed_type'),
+                feed_brand=request.POST.get('feed_brand'),
+                chick_request=get_object_or_404(ChickRequest, id=request.POST.get('chick_request')),
+                bags_allocated=request.POST.get('bags_allocated'),
+                amount_due=request.POST.get('amount_due'),
+                payment_due_date=request.POST.get('payment_due_date'),
+                payment_status=request.POST.get('payment_status')
+            )
+            feed_allocation.full_clean()
+            feed_allocation.save()
+            messages.success(request, f'Feed request submitted successfully! Feed Request ID: {feed_allocation.feed_request_id}')
+            return redirect('salesagentdashboard')
+        except Exception as e:
+            messages.error(request, str(e))
+    
+    return render(request, '1addFeedRequest.html', {'chick_requests': chick_requests})
 
 @role_required('sales_agent')
 def ViewSalesAgentChickRequests(request):
