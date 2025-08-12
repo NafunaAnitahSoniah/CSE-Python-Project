@@ -3,41 +3,101 @@
 {% block content %}
 <header class="page-header">
     <h1>Sales</h1>
+    <div class="subtitle">View feed and chick sales with filters and totals</div>
+    <div class="card" style="margin-top:1rem; display:inline-block; padding:0.5rem 1rem;">
+        <h4 style="margin:0;"><i class="fas fa-sack-dollar"></i> Total Sales</h4>
+        <div class="metric">{{ total_sales|default:0 }}</div>
+    </div>
+    <form method="get" class="form-inline" style="margin-top:1rem;">
+        <label class="me-2">From:</label>
+        <input class="form-control me-2" type="date" name="start" value="{{ start }}">
+        <label class="me-2">To:</label>
+        <input class="form-control me-2" type="date" name="end" value="{{ end }}">
+        <button class="btn btn-primary" type="submit"><i class="fas fa-filter"></i> Apply</button>
+        <a class="btn btn-secondary ms-2" href="/sales/"><i class="fas fa-rotate-left"></i> Reset</a>
+    </form>
 </header>
+
 <div class="table-card fade-in">
-    <h4><i class="fas fa-sack-dollar"></i> Overview</h4>
+    <h4><i class="fas fa-wheat-awn"></i> Feed Sales</h4>
     <div class="table-responsive">
         <table class="data-table">
             <thead>
                 <tr>
-                    <th>Sale ID</th>
                     <th>Request ID</th>
-                    <th>Farmer Name</th>
-                    <th>Chick Type</th>
-                    <th>Quantity</th>
-                    <th>Total Amount (UgSh)</th>
+                    <th>Farmer</th>
+                    <th>Feed</th>
+                    <th>Brand</th>
+                    <th>Bags</th>
+                    <th>Unit Price</th>
+                    <th>Total Amount</th>
                     <th>Date</th>
-                    <th>Recorded By</th>
                 </tr>
             </thead>
             <tbody>
-                {% for sale in sales %}
+                {% for r in feed_rows %}
                 <tr>
-                    <td>{{ sale.sale_id }}</td>
-                    <td>{{ sale.chick_request.chick_request_id }}</td>
-                    <td>{{ sale.chick_request.farmer.farmer_name }}</td>
-                    <td>{{ sale.chick_request.chick_type|title }}</td>
-                    <td>{{ sale.chick_request.quantity }}</td>
-                    <td>{{ sale.total_amount|floatformat:0 }}</td>
-                    <td>{{ sale.created_at|date:'Y-m-d' }}</td>
-                    <td>{{ sale.recorded_by.get_full_name|default:sale.recorded_by.username }}</td>
+                    <td>{{ r.req_id }}</td>
+                    <td>{{ r.farmer }}</td>
+                    <td>{{ r.feed_name }}</td>
+                    <td>{{ r.brand }}</td>
+                    <td>{{ r.bags }}</td>
+                    <td>{{ r.unit_price }}</td>
+                    <td>{{ r.amount }}</td>
+                    <td>{{ r.date|date:'Y-m-d' }}</td>
                 </tr>
                 {% empty %}
-                <tr>
-                    <td colspan="8">No sales records available.</td>
-                </tr>
+                <tr><td colspan="8">No feed sales in the selected period.</td></tr>
                 {% endfor %}
             </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="6" class="text-end"><strong>Feed Total:</strong></td>
+                    <td colspan="2"><strong>{{ feed_total }}</strong></td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+
+<div class="table-card fade-in">
+    <h4><i class="fas fa-egg"></i> Chick Sales</h4>
+    <div class="table-responsive">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Request ID</th>
+                    <th>Farmer</th>
+                    <th>Type</th>
+                    <th>Breed</th>
+                    <th>Qty</th>
+                    <th>Unit Price</th>
+                    <th>Total Amount</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in chick_rows %}
+                <tr>
+                    <td>{{ r.req_id }}</td>
+                    <td>{{ r.farmer }}</td>
+                    <td>{{ r.type|title }}</td>
+                    <td>{{ r.breed|title }}</td>
+                    <td>{{ r.qty }}</td>
+                    <td>{{ r.unit_price }}</td>
+                    <td>{{ r.amount }}</td>
+                    <td>{{ r.date|date:'Y-m-d' }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="8">No chick sales in the selected period.</td></tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="6" class="text-end"><strong>Chick Total:</strong></td>
+                    <td colspan="2"><strong>{{ chick_total }}</strong></td>
+                </tr>
+            </tfoot>
         </table>
     </div>
 </div>

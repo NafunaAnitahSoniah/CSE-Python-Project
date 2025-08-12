@@ -142,6 +142,8 @@ class ChickRequest(models.Model):
     quantity = models.PositiveIntegerField()
     chick_period = models.PositiveIntegerField()  # Age of chicks requested
     feed_taken = models.BooleanField(default=True)  # Whether feed is taken
+    # Optional selected feed name (from approved allocations for the agent)
+    feed_name = models.CharField(max_length=25, null=True, blank=True)
     payment_terms = models.CharField(
         max_length=20,
         choices=[('mobile_money', 'Mobile Money'), ('visa', 'Visa'), ('cash', 'Cash')]
@@ -175,14 +177,13 @@ class ChickRequest(models.Model):
         super().save(*args, **kwargs)
 
     def clean(self):
-        # Validate quantity based on farmer type
-        if self.farmer_type == 'starter' and self.quantity != 100:
-            raise ValidationError('Starter farmers must request exactly 100 chicks.')
+        # Removed validation for starter farmers to allow any quantity
         if self.farmer_type == 'returning' and self.quantity > 500:
             raise ValidationError('Returning farmers cannot request more than 500 chicks.')
-        # Check stock availability
-        stock = ChickStock.objects.filter(chick_type=self.chick_type, chick_breed=self.chick_breed).first()
-        if stock and stock.stock_quantity < self.quantity:
+        # Check total stock availability across all matching stocks
+        qs = ChickStock.objects.filter(chick_type=self.chick_type, chick_breed=self.chick_breed)
+        available = sum(s.stock_quantity or 0 for s in qs)
+        if available < (self.quantity or 0):
             raise ValidationError('Requested quantity exceeds available stock.')
         # Check 4-month frequency
         last_request = ChickRequest.objects.filter(farmer=self.farmer, request_date__gte=timezone.now() - timedelta(days=120)).exclude(id=self.id).first()
@@ -190,7 +191,14 @@ class ChickRequest(models.Model):
             raise ValidationError('You can only submit a request every 4 months.')
 
 class FeedAllocation(models.Model):
+    STATUS_CHOICES = (
+        ('pending', 'Pending'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected'),
+        ('completed', 'Completed'),
+    )
     feed_request_id = models.CharField(max_length=15, unique=True, blank=True)
+    feed_stock = models.ForeignKey(FeedStock, on_delete=models.CASCADE, null=True, blank=True)
     feed_name = models.CharField(max_length=25)
     feed_type = models.CharField(max_length=25)
     feed_brand = models.CharField(max_length=25)
@@ -198,9 +206,10 @@ class FeedAllocation(models.Model):
     bags_allocated = models.PositiveIntegerField(default=2)
     amount_due = models.PositiveIntegerField()
     payment_due_date = models.DateField()
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     payment_status = models.CharField(
         max_length=20,
-        choices=[('pending', 'Pending'), ('paid', 'Paid')],
+        choices=[('pending', 'Pending'), ('paid', 'Paid'), ('rejected', 'Rejected')],
         default='pending'
     )
 
@@ -208,6 +217,14 @@ class FeedAllocation(models.Model):
         return self.feed_request_id
 
     def save(self, *args, **kwargs):
+        # Track previous payment status (for updates)
+        prev_payment = None
+        if self.pk:
+            try:
+                prev_payment = FeedAllocation.objects.only('payment_status').get(pk=self.pk).payment_status
+            except FeedAllocation.DoesNotExist:
+                prev_payment = None
+
         # Auto-generate feed_request_id if not provided
         if not self.feed_request_id:
             # Generate a unique feed request ID with format FEED-YYYY-XXXX
@@ -226,17 +243,10 @@ class FeedAllocation(models.Model):
         # Auto-set payment_due_date to 2 months from now
         if not self.payment_due_date:
             self.payment_due_date = timezone.now().date() + timedelta(days=60)
+
+        # Persist changes first
         super().save(*args, **kwargs)
 
-class Sale(models.Model):
-    sale_id = models.CharField(max_length=15, unique=True)
-    chick_request = models.OneToOneField(ChickRequest, on_delete=models.CASCADE)
-    total_amount = models.PositiveIntegerField()  # quantity * chick_price
-    created_at = models.DateTimeField(auto_now_add=True)
-    recorded_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
-
-    def __str__(self):
-        return self.sale_id
 
 
 

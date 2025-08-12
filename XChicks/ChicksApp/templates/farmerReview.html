@@ -28,7 +28,8 @@
                     <td>{{ request.chick_request_id }}</td>
                     <td>{{ request.chick_type|title }}</td>
                     <td>{{ request.quantity }}</td>
-                    <td><span class="status-badge status-{{ request.status|lower }}">{{ request.status|title }}</span></td>
+                    <td><span class="status-badge status-{{ request.status|lower }}">{{ request.status|title }}</span>
+                    </td>
                     <td>{{ request.request_date|date:'Y-m-d' }}</td>
                     <td>
                         {% if request.status == 'pending' %}

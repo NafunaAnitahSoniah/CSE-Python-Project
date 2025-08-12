@@ -2,13 +2,13 @@
 {% block title %}Chick Stock | Young4ChickS{% endblock %}
 {% block content %}
 <header class="page-header"><h1>Chick Stock</h1></header>
-<div class="mb-2"><a href="/updatechickstock/" class="btn btn-primary"><i class="fas fa-pen"></i> Update Chick Stock</a></div>
+<div class="mb-2"><a href="/updatechickstock/" class="btn btn-primary"><i class="fas fa-plus"></i> Add Chick Stock</a></div>
 <div class="table-card fade-in">
     <h4><i class="fas fa-egg"></i> Inventory</h4>
     <div class="table-responsive">
-        <table class="data-table">
+    <table class="data-table">
             <thead>
-                <tr><th>Batch</th><th>Type</th><th>Breed</th><th>Age (days)</th><th>Price</th><th>Qty</th><th>Updated</th><th>Actions</th></tr>
+        <tr><th>Batch</th><th>Type</th><th>Breed</th><th>Price</th><th>Qty</th><th>Updated</th><th>Actions</th></tr>
             </thead>
             <tbody>
                 {% for stock in chick_stocks %}
@@ -16,7 +16,6 @@
                     <td>{{ stock.batch_name }}</td>
                     <td>{{ stock.chick_type }}</td>
                     <td>{{ stock.chick_breed }}</td>
-                    <td>{{ stock.chick_age }}</td>
                     <td>{{ stock.chick_price }}</td>
                     <td>{{ stock.stock_quantity }}</td>
                     <td>{{ stock.updated_at|date:'Y-m-d H:i' }}</td>

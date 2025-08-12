@@ -33,6 +33,7 @@ urlpatterns = [
     path('managersdashboard/', views.Managersdashboard, name='Managersdashboard'),
     path('chickrequests/', views.ViewChickRequests, name='Viewchickrequests'),
     path('feedrequests/', views.ViewFeedRequests, name='Viewfeedrequests'),
+    path('approvechickrequest/<int:request_id>/', views.ApproveChickRequest, name='Approvechickrequest'),
     path('farmerreview/', views.FarmerReview, name='Farmerreview'),
     path('farmerrecords/', views.FarmerRecords, name='Farmerrecords'),
     path('chickstock/', views.chickStock, name='Chickstock'),
@@ -40,8 +41,17 @@ urlpatterns = [
     path('updatechickstock/', views.UpdateChickStock, name='Updatechickstock'),
     path('updatechickstock/<int:stock_id>/', views.UpdateChickStock, name='Updatechickstock_edit'),
     path('updatefeedstock/', views.UpdateFeedStock, name='Updatefeedstock'),
+    path('updatefeedstock/<int:stock_id>/', views.UpdateFeedStock, name='Updatefeedstock_edit'),
+    path('approvefeedrequest/<int:request_id>/', views.ApproveFeedRequest, name='Approvefeedrequest'),
     path('reports/', views.Reports, name='Reports'),
     path('sales/', views.Sales, name='Sales'),
+    # TXT exports
+    path('export/sales/', views.export_sales_txt, name='export_sales_txt'),
+    path('export/chick-requests/', views.export_chick_requests_txt, name='export_chick_requests_txt'),
+    path('export/feed-allocations/', views.export_feed_allocations_txt, name='export_feed_allocations_txt'),
+    path('export/chick-stock/', views.export_chick_stock_txt, name='export_chick_stock_txt'),
+    path('export/feed-stock/', views.export_feed_stock_txt, name='export_feed_stock_txt'),
+    path('export/farmers/', views.export_farmers_txt, name='export_farmers_txt'),
 
     #sales agent dashboard
     path('salesagentdashboard/', views.SalesAgentdashboard, name='salesagentdashboard'),
