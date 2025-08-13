@@ -212,6 +212,7 @@ class FeedAllocation(models.Model):
         choices=[('pending', 'Pending'), ('paid', 'Paid'), ('rejected', 'Rejected')],
         default='pending'
     )
+    delivered = models.BooleanField(default=False)
 
     def __str__(self):
         return self.feed_request_id

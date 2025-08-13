@@ -45,6 +45,9 @@ urlpatterns = [
     path('approvefeedrequest/<int:request_id>/', views.ApproveFeedRequest, name='Approvefeedrequest'),
     path('reports/', views.Reports, name='Reports'),
     path('sales/', views.Sales, name='Sales'),
+    path('deliveries/', views.Deliveries, name='Deliveries'),
+    path('deliveries/mark/chick/<int:req_id>/', views.MarkChickDelivered, name='mark_chick_delivered'),
+    path('deliveries/mark/feed/<int:alloc_id>/', views.MarkFeedDelivered, name='mark_feed_delivered'),
     # TXT exports
     path('export/sales/', views.export_sales_txt, name='export_sales_txt'),
     path('export/chick-requests/', views.export_chick_requests_txt, name='export_chick_requests_txt'),

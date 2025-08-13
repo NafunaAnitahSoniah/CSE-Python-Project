@@ -84,12 +84,14 @@ def Managersdashboard(request):
     total_users = UserProfile.objects.count()
     chick_stock = ChickStock.objects.aggregate(total=Sum('stock_quantity'))['total'] or 0
     feed_stock = FeedStock.objects.aggregate(total=Sum('feed_quantity'))['total'] or 0
-    request_stats = ChickRequest.objects.values('status').annotate(c=Count('id'))
-    stats_map = {r['status']: r['c'] for r in request_stats}
-    completed_requests = stats_map.get('completed', 0)
-    approved_requests = stats_map.get('approved', 0)
-    pending_requests = stats_map.get('pending', 0)
-    rejected_requests = stats_map.get('rejected', 0)
+    # Combine chick and feed request stats
+    chick_stats = ChickRequest.objects.values('status').annotate(c=Count('id'))
+    feed_stats = FeedAllocation.objects.values('status').annotate(c=Count('id'))
+    chick_map = {r['status']: r['c'] for r in chick_stats}
+    feed_map = {r['status']: r['c'] for r in feed_stats}
+    pending_requests = chick_map.get('pending', 0) + feed_map.get('pending', 0)
+    approved_requests = chick_map.get('approved', 0) + feed_map.get('approved', 0)
+    rejected_requests = chick_map.get('rejected', 0) + feed_map.get('rejected', 0)
     # Total sales amount = feed (approved: bags*selling_price) + chicks (approved: qty*price)
     feed_total = FeedAllocation.objects.filter(status='approved').aggregate(
         total=Sum(F('bags_allocated') * F('feed_stock__selling_price'))
@@ -104,8 +106,13 @@ def Managersdashboard(request):
         ).order_by('-updated_at').values_list('chick_price', flat=True).first() or 1650
         chick_total += int(req.quantity or 0) * int(price)
     total_sales = feed_total + chick_total
-    deliveries_made = ChickRequest.objects.filter(delivered=True).count()
-    pending_deliveries = ChickRequest.objects.filter(status='approved', delivered=False).count()
+    # Delivery stats combining chick and feed deliveries
+    delivered_chicks = ChickRequest.objects.filter(delivered=True).count()
+    delivered_feeds = FeedAllocation.objects.filter(delivered=True).count()
+    deliveries_made = delivered_chicks + delivered_feeds
+    pending_chick_deliv = ChickRequest.objects.filter(status='approved', delivered=False).count()
+    pending_feed_deliv = FeedAllocation.objects.filter(status='approved', delivered=False).count()
+    pending_deliveries = pending_chick_deliv + pending_feed_deliv
     farmers_with_feeds = FeedAllocation.objects.values('chick_request__farmer').distinct().count()
     farmers_paid = FeedAllocation.objects.filter(payment_status='paid').count()
     pending_payments = FeedAllocation.objects.filter(payment_status='pending').count()
@@ -113,7 +120,7 @@ def Managersdashboard(request):
         'total_users': total_users,
         'chick_stock': chick_stock,
         'feed_stock': feed_stock,
-        'completed_requests': completed_requests,
+    'completed_requests': deliveries_made,
         'approved_requests': approved_requests,
         'pending_requests': pending_requests,
         'rejected_requests': rejected_requests,
@@ -477,7 +484,10 @@ def SalesAgentdashboard(request):
     sc_map = {s['status']: s['c'] for s in status_counts}
     total_my_requests = my_requests.count()
     total_chicks_requested = my_requests.aggregate(total=Sum('quantity'))['total'] or 0
-    delivered = my_requests.filter(delivered=True).count()
+    # Count deliveries across chicks and feed allocations for this agent
+    delivered_chicks = my_requests.filter(delivered=True).count()
+    delivered_feeds = FeedAllocation.objects.filter(chick_request__created_by=request.user, delivered=True).count()
+    delivered = delivered_chicks + delivered_feeds
     context = {
         'total_my_requests': total_my_requests,
         'total_chicks_requested': total_chicks_requested,
@@ -751,5 +761,35 @@ def Logout(request):
     logout(request)
 
     return redirect('/')
+
+
+# --- Deliveries Management (manager) ---
+@role_required('manager')
+def Deliveries(request):
+    approved_chicks = ChickRequest.objects.filter(status='approved').select_related('farmer').order_by('-approved_on')
+    approved_feeds = FeedAllocation.objects.filter(status='approved').select_related('chick_request__farmer').order_by('-id')
+    return render(request, 'deliveries.html', {
+        'approved_chicks': approved_chicks,
+        'approved_feeds': approved_feeds,
+    })
+
+@role_required('manager')
+def MarkChickDelivered(request, req_id:int):
+    req = get_object_or_404(ChickRequest, id=req_id)
+    if request.method == 'POST':
+        req.delivered = True
+        req.status = req.status  # keep status as-approved; deliveries counted separately
+        req.save(update_fields=['delivered'])
+        messages.success(request, f"Marked {req.chick_request_id} as delivered.")
+    return redirect('Deliveries')
+
+@role_required('manager')
+def MarkFeedDelivered(request, alloc_id:int):
+    alloc = get_object_or_404(FeedAllocation, id=alloc_id)
+    if request.method == 'POST':
+        alloc.delivered = True
+        alloc.save(update_fields=['delivered'])
+        messages.success(request, f"Marked {alloc.feed_request_id} as delivered.")
+    return redirect('Deliveries')
 
 

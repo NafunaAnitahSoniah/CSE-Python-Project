@@ -5,7 +5,7 @@
     <h1>Sales</h1>
     <div class="subtitle">View feed and chick sales with filters and totals</div>
     <div class="card" style="margin-top:1rem; display:inline-block; padding:0.5rem 1rem;">
-        <h4 style="margin:0;"><i class="fas fa-sack-dollar"></i> Total Sales</h4>
+        <h4 style="margin:0;"><i class="fas fa-sack-dollar"></i> Total Sales (UGX)</h4>
         <div class="metric">{{ total_sales|default:0 }}</div>
     </div>
     <form method="get" class="form-inline" style="margin-top:1rem;">
@@ -29,8 +29,8 @@
                     <th>Feed</th>
                     <th>Brand</th>
                     <th>Bags</th>
-                    <th>Unit Price</th>
-                    <th>Total Amount</th>
+                    <th>Unit Price (UGX)</th>
+                    <th>Total Amount (UGX)</th>
                     <th>Date</th>
                 </tr>
             </thead>
@@ -52,7 +52,7 @@
             </tbody>
             <tfoot>
                 <tr>
-                    <td colspan="6" class="text-end"><strong>Feed Total:</strong></td>
+                    <td colspan="6" class="text-end"><strong>Feed Total (UGX):</strong></td>
                     <td colspan="2"><strong>{{ feed_total }}</strong></td>
                 </tr>
             </tfoot>
@@ -71,8 +71,8 @@
                     <th>Type</th>
                     <th>Breed</th>
                     <th>Qty</th>
-                    <th>Unit Price</th>
-                    <th>Total Amount</th>
+                    <th>Unit Price (UGX)</th>
+                    <th>Total Amount (UGX)</th>
                     <th>Date</th>
                 </tr>
             </thead>
@@ -94,7 +94,7 @@
             </tbody>
             <tfoot>
                 <tr>
-                    <td colspan="6" class="text-end"><strong>Chick Total:</strong></td>
+                    <td colspan="6" class="text-end"><strong>Chick Total (UGX):</strong></td>
                     <td colspan="2"><strong>{{ chick_total }}</strong></td>
                 </tr>
             </tfoot>

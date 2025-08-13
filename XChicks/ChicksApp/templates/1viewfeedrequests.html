@@ -21,6 +21,7 @@
                     <th>Payment Due Date</th>
                     <th>Payment Status</th>
                     <th>Request Status</th>
+                    <th>Delivered</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -38,9 +39,16 @@
                     <td data-label="Payment Status">
                         <span class="status-badge status-{{ allocation.payment_status|lower }}">{{ allocation.payment_status|title }}</span>
                     </td>
-                    <td data-label="Request Status">
-                        <span class="status-badge status-{{ allocation.status|lower }}">{{ allocation.status|title }}</span>
-                    </td>
+                                        <td data-label="Request Status">
+                                                <span class="status-badge status-{{ allocation.status|lower }}">{{ allocation.status|title }}</span>
+                                        </td>
+                                        <td data-label="Delivered">
+                                                {% if allocation.delivered %}
+                                                    <span class="status-badge status-approved">Yes</span>
+                                                {% else %}
+                                                    <span class="status-badge status-rejected">No</span>
+                                                {% endif %}
+                                        </td>
                     <td data-label="Actions">
                         {% if allocation.status == 'pending' %}
                         <span class="text-muted">Awaiting manager approval</span>

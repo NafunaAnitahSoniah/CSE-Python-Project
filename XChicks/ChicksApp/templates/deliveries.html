@@ -1,0 +1,94 @@
+{% extends 'base_manager.html' %}
+{% block title %}Deliveries | Young4ChickS{% endblock %}
+{% block content %}
+<header class="page-header">
+  <h1>Deliveries</h1>
+  <div class="subtitle">Mark approved requests as delivered</div>
+</header>
+
+<section class="table-card fade-in">
+  <h4><i class="fas fa-egg"></i> Approved Chick Requests</h4>
+  <div class="table-responsive">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Req ID</th><th>Farmer</th><th>Type/Breed</th><th>Qty</th><th>Approved On</th><th>Delivered</th><th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in approved_chicks %}
+        <tr>
+          <td>{{ r.chick_request_id }}</td>
+          <td>{{ r.farmer.farmer_name }}</td>
+          <td>{{ r.chick_type }}/{{ r.chick_breed }}</td>
+          <td>{{ r.quantity }}</td>
+          <td>{{ r.approved_on|date:'Y-m-d H:i' }}</td>
+          <td>
+            {% if r.delivered %}
+              <span class="status-badge status-approved">YES</span>
+            {% else %}
+              <span class="status-badge status-rejected">NO</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if not r.delivered %}
+            <form method="post" action="{% url 'mark_chick_delivered' r.id %}" style="display:inline;">
+              {% csrf_token %}
+              <button class="btn btn-primary btn-sm" onclick="return confirm('Mark delivered?')"><i class="fas fa-truck"></i> Mark Delivered</button>
+            </form>
+            {% else %}
+              <span class="text-muted">Delivered</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="7">No approved chick requests.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="table-card fade-in" style="margin-top:20px;">
+  <h4><i class="fas fa-seedling"></i> Approved Feed Requests</h4>
+  <div class="table-responsive">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Feed ID</th><th>Req ID</th><th>Feed</th><th>Bags</th><th>Payment</th><th>Delivered</th><th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for a in approved_feeds %}
+        <tr>
+          <td>{{ a.feed_request_id }}</td>
+          <td>{{ a.chick_request.chick_request_id }}</td>
+          <td>{{ a.feed_name }} ({{ a.feed_brand }})</td>
+          <td>{{ a.bags_allocated }}</td>
+          <td>{{ a.payment_status|title }}</td>
+          <td>
+            {% if a.delivered %}
+              <span class="status-badge status-approved">YES</span>
+            {% else %}
+              <span class="status-badge status-rejected">NO</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if not a.delivered %}
+            <form method="post" action="{% url 'mark_feed_delivered' a.id %}" style="display:inline;">
+              {% csrf_token %}
+              <button class="btn btn-primary btn-sm" onclick="return confirm('Mark delivered?')"><i class="fas fa-truck"></i> Mark Delivered</button>
+            </form>
+            {% else %}
+              <span class="text-muted">Delivered</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="7">No approved feed requests.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

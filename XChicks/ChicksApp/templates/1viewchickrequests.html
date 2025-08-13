@@ -30,7 +30,7 @@
             </thead>
             <tbody>
                 {% for request in chick_requests %}
-                <tr class="status-{{ request.status|lower }}">
+                <tr>
                     <td data-label="Request ID">{{ request.chick_request_id }}</td>
                     <td data-label="Farmer">{{ request.farmer.farmer_name }}</td>
                     <td data-label="Farmer Type">{{ request.farmer_type }}</td>
@@ -46,7 +46,11 @@
                         <span class="badge badge-{{ request.status|lower }}">{{ request.status }}</span>
                     </td>
                     <td data-label="Approved On">{{ request.approved_on|date:'Y-m-d H:i'|default:"N/A" }}</td>
-                    <td data-label="Delivered">{{ request.delivered|yesno:"Yes,No" }}</td>
+                    <td data-label="Delivered">
+                        <span class="status-badge {% if request.delivered %}status-approved{% else %}status-rejected{% endif %}">
+                            {{ request.delivered|yesno:"Yes,No" }}
+                        </span>
+                    </td>
                     <td data-label="Actions">
                         {% if request.status == 'pending' %}
                         <a href="/deleterequest/{{ request.id }}/" class="btn btn-danger btn-sm"><i class="fas fa-trash"></i> Delete</a>
