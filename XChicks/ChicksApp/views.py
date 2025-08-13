@@ -1,9 +1,10 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.db.models import Sum, Count, F
-from django.http import HttpResponse
+from django.db.models import Sum, Count, F, Q
+from django.http import HttpResponse, HttpResponseBadRequest
 from datetime import datetime
+from django.utils import timezone
 from django.core.exceptions import PermissionDenied
 from .models import *
 from .forms import *
@@ -307,38 +308,232 @@ def UpdateFeedStock(request, stock_id=None):
 
 @role_required('manager')
 def Reports(request):
-    # Get various statistics for the reports page
-    # Total sales amount for reports (same calc as dashboard)
-    feed_total = FeedAllocation.objects.filter(status='approved').aggregate(
+    # Filters
+    def parse_date(s):
+        try:
+            return datetime.strptime(s, '%Y-%m-%d').date()
+        except Exception:
+            return None
+    filters = {
+        'start': request.GET.get('start') or '',
+        'end': request.GET.get('end') or '',
+        'chick_type': request.GET.get('chick_type') or '',
+        'chick_breed': request.GET.get('chick_breed') or '',
+        'feed_type': request.GET.get('feed_type') or '',
+        'status': request.GET.get('status') or '',
+        'agent': request.GET.get('agent') or '',
+        'farmer': request.GET.get('farmer') or '',
+        'q': request.GET.get('q') or '',
+    }
+    start_date = parse_date(filters['start'])
+    end_date = parse_date(filters['end'])
+
+    # Base querysets
+    chick_requests_qs = ChickRequest.objects.select_related('farmer', 'created_by').order_by('-request_date')
+    feed_allocations_qs = FeedAllocation.objects.select_related('chick_request', 'chick_request__farmer', 'feed_stock').order_by('-id')
+    farmers_qs = Customer.objects.order_by('-registration_date')
+    chick_stock_qs = ChickStock.objects.order_by('batch_name')
+    feed_stock_qs = FeedStock.objects.order_by('stock_name')
+
+    # Apply filters
+    if start_date:
+        chick_requests_qs = chick_requests_qs.filter(request_date__date__gte=start_date)
+        feed_allocations_qs = feed_allocations_qs.filter(chick_request__request_date__date__gte=start_date)
+        farmers_qs = farmers_qs.filter(registration_date__date__gte=start_date)
+    if end_date:
+        chick_requests_qs = chick_requests_qs.filter(request_date__date__lte=end_date)
+        feed_allocations_qs = feed_allocations_qs.filter(chick_request__request_date__date__lte=end_date)
+        farmers_qs = farmers_qs.filter(registration_date__date__lte=end_date)
+    if filters['chick_type']:
+        chick_requests_qs = chick_requests_qs.filter(chick_type=filters['chick_type'])
+        chick_stock_qs = chick_stock_qs.filter(chick_type=filters['chick_type'])
+    if filters['chick_breed']:
+        chick_requests_qs = chick_requests_qs.filter(chick_breed=filters['chick_breed'])
+        chick_stock_qs = chick_stock_qs.filter(chick_breed=filters['chick_breed'])
+    if filters['feed_type']:
+        feed_allocations_qs = feed_allocations_qs.filter(feed_type=filters['feed_type'])
+        feed_stock_qs = feed_stock_qs.filter(feed_type=filters['feed_type'])
+    if filters['status']:
+        chick_requests_qs = chick_requests_qs.filter(status=filters['status'])
+        feed_allocations_qs = feed_allocations_qs.filter(status=filters['status'])
+    if filters['agent']:
+        chick_requests_qs = chick_requests_qs.filter(created_by_id=filters['agent'])
+        feed_allocations_qs = feed_allocations_qs.filter(chick_request__created_by_id=filters['agent'])
+    if filters['farmer']:
+        chick_requests_qs = chick_requests_qs.filter(farmer_id=filters['farmer'])
+        feed_allocations_qs = feed_allocations_qs.filter(chick_request__farmer_id=filters['farmer'])
+    if filters['q']:
+        q = filters['q']
+        chick_requests_qs = chick_requests_qs.filter(
+            Q(chick_request_id__icontains=q) | Q(farmer__farmer_name__icontains=q) | Q(created_by__username__icontains=q)
+        )
+        feed_allocations_qs = feed_allocations_qs.filter(
+            Q(feed_request_id__icontains=q) | Q(chick_request__chick_request_id__icontains=q) | Q(chick_request__farmer__farmer_name__icontains=q)
+        )
+        farmers_qs = farmers_qs.filter(Q(farmer_id__icontains=q) | Q(farmer_name__icontains=q))
+
+    # Totals and stats
+    chick_stock_total = chick_stock_qs.aggregate(total=Sum('stock_quantity'))['total'] or 0
+    feed_stock_total = feed_stock_qs.aggregate(total=Sum('feed_quantity'))['total'] or 0
+
+    # Sales totals
+    feed_total = feed_allocations_qs.filter(status='approved').aggregate(
         total=Sum(F('bags_allocated') * F('feed_stock__selling_price'))
     )['total'] or 0
     chick_total = 0
-    for req in ChickRequest.objects.filter(status='approved'):
+    for req in chick_requests_qs.filter(status='approved'):
         price = ChickStock.objects.filter(
             chick_type=req.chick_type,
             chick_breed=req.chick_breed
         ).order_by('-updated_at').values_list('chick_price', flat=True).first() or 1650
         chick_total += int(req.quantity or 0) * int(price)
     total_sales = feed_total + chick_total
-    total_chick_requests = ChickRequest.objects.count()
-    total_feed_allocations = FeedAllocation.objects.count()
-    total_farmers = Customer.objects.count()
-    
-    # Get pending items
-    pending_chick_requests = ChickRequest.objects.filter(status='pending').count()
-    pending_feed_payments = FeedAllocation.objects.filter(payment_status='pending').count()
-    
-    # Get low stock items (less than 100 chicks or 50 bags of feed)
-    low_stock_chicks = ChickStock.objects.filter(stock_quantity__lt=100).count()
-    low_stock_feeds = FeedStock.objects.filter(feed_quantity__lt=50).count()
-    low_stock_items = low_stock_chicks + low_stock_feeds
-    
-    # Get latest dates
-    last_chick_request = ChickRequest.objects.order_by('-request_date').first()
-    last_feed_allocation = FeedAllocation.objects.order_by('-id').first()
-    last_stock_update = ChickStock.objects.order_by('-updated_at').first()
-    
+
+    # Use the same sliced datasets for tables and stats to keep summaries in sync with what's shown
+    chick_requests_display = list(chick_requests_qs[:1000])
+    feed_allocations_display = list(feed_allocations_qs[:1000])
+
+    total_chick_requests = len(chick_requests_display)
+    total_feed_allocations = len(feed_allocations_display)
+    total_farmers = farmers_qs.count()
+    pending_chick_requests = chick_requests_qs.filter(status='pending').count()
+    pending_feed_payments = feed_allocations_qs.filter(payment_status='pending').count()
+    low_stock_items = ChickStock.objects.filter(stock_quantity__lt=100).count() + FeedStock.objects.filter(feed_quantity__lt=50).count()
+
+    # Status stats for block (compute from the same displayed lists)
+    from collections import Counter
+    sc_counter = Counter(getattr(r, 'status', '') for r in chick_requests_display)
+    sf_counter = Counter(getattr(a, 'status', '') for a in feed_allocations_display)
+    stats = {
+        'cr_pending': sc_counter.get('pending', 0),
+        'cr_approved': sc_counter.get('approved', 0),
+        'cr_rejected': sc_counter.get('rejected', 0),
+        'fa_pending': sf_counter.get('pending', 0),
+        'fa_approved': sf_counter.get('approved', 0),
+        'fa_rejected': sf_counter.get('rejected', 0),
+    }
+
+    # Activity charts (daily buckets) and weekly summary
+    from collections import OrderedDict
+    buckets = OrderedDict()
+    def date_key(dt):
+        d = dt.date() if hasattr(dt, 'date') else dt
+        return d.strftime('%Y-%m-%d')
+    for r in chick_requests_qs:
+        k = date_key(r.request_date)
+        buckets.setdefault(k, {'chicks':0,'feeds':0})
+        buckets[k]['chicks'] += 1
+    for a in feed_allocations_qs:
+        k = date_key(a.chick_request.request_date)
+        buckets.setdefault(k, {'chicks':0,'feeds':0})
+        buckets[k]['feeds'] += 1
+    activity_labels = list(buckets.keys())
+    activity_chicks = [buckets[k]['chicks'] for k in activity_labels]
+    activity_feeds = [buckets[k]['feeds'] for k in activity_labels]
+    # Status mix for chicks (used by charts/summary); derive from same displayed counts
+    status_mix = {k: sc_counter.get(k, 0) for k in ['pending','approved','rejected','completed']}
+
+    # Weekly summary: ISO year-week
+    from collections import defaultdict
+    wk = defaultdict(lambda: {'chicks':0,'feeds':0})
+    for r in chick_requests_qs:
+        y, w, _ = r.request_date.isocalendar()
+        wk[(y,w)]['chicks'] += 1
+    for a in feed_allocations_qs:
+        y, w, _ = a.chick_request.request_date.isocalendar()
+        wk[(y,w)]['feeds'] += 1
+    weekly_summary = [
+        {
+            'label': f"{y}-W{w:02d}",
+            'chicks': v['chicks'],
+            'feeds': v['feeds'],
+            'total': v['chicks'] + v['feeds'],
+        }
+        for (y,w), v in sorted(wk.items())
+    ]
+
+    # Agent performance
+    agent_perf_map = {}
+    # Chick requests contribution
+    for r in chick_requests_display:
+        key = getattr(r.created_by, 'username', 'N/A')
+        d = agent_perf_map.setdefault(key, {'total':0,'approved':0,'rejected':0,'delivered':0})
+        d['total'] += 1
+        if r.status=='approved': d['approved'] += 1
+        if r.status=='rejected': d['rejected'] += 1
+        if r.delivered: d['delivered'] += 1
+    # Feed allocations contribution (by request owner)
+    for a in feed_allocations_display:
+        key = getattr(getattr(a.chick_request, 'created_by', None), 'username', 'N/A')
+        d = agent_perf_map.setdefault(key, {'total':0,'approved':0,'rejected':0,'delivered':0})
+        d['total'] += 1
+        if a.status=='approved': d['approved'] += 1
+        if a.status=='rejected': d['rejected'] += 1
+        if a.delivered: d['delivered'] += 1
+    agent_perf = [{'agent':k, **v} for k,v in sorted(agent_perf_map.items())]
+
+    # Choices and aux lists
+    chick_type_choices = ChickStock._meta.get_field('chick_type').choices
+    chick_breed_choices = ChickStock._meta.get_field('chick_breed').choices
+    feed_types = list(FeedStock.objects.values_list('feed_type', flat=True).distinct())
+    agents = UserProfile.objects.filter(role='sales_agent').order_by('username')
+    farmers_all = Customer.objects.order_by('farmer_name')
+
+    # Trends (last 30 days vs previous 30), only when no explicit date filter
+    trends = None
+    if not start_date and not end_date:
+        from datetime import timedelta
+        today = timezone.now().date()
+        cur_start = today - timedelta(days=30)
+        prev_start = today - timedelta(days=60)
+        prev_end = today - timedelta(days=30)
+        # counts
+        cr_cur = ChickRequest.objects.filter(request_date__date__gte=cur_start).count()
+        cr_prev = ChickRequest.objects.filter(request_date__date__gte=prev_start, request_date__date__lt=prev_end).count()
+        fa_cur = FeedAllocation.objects.filter(chick_request__request_date__date__gte=cur_start).count()
+        fa_prev = FeedAllocation.objects.filter(chick_request__request_date__date__gte=prev_start, chick_request__request_date__date__lt=prev_end).count()
+        # sales
+        def calc_sales(start_d, end_d=None):
+            feed_qs = FeedAllocation.objects.filter(status='approved', chick_request__request_date__date__gte=start_d)
+            if end_d:
+                feed_qs = feed_qs.filter(chick_request__request_date__date__lt=end_d)
+            feed_t = feed_qs.aggregate(total=Sum(F('bags_allocated') * F('feed_stock__selling_price')))['total'] or 0
+            chick_qs2 = ChickRequest.objects.filter(status='approved', request_date__date__gte=start_d)
+            if end_d:
+                chick_qs2 = chick_qs2.filter(request_date__date__lt=end_d)
+            ct = 0
+            for r in chick_qs2:
+                price = ChickStock.objects.filter(chick_type=r.chick_type, chick_breed=r.chick_breed).order_by('-updated_at').values_list('chick_price', flat=True).first() or 1650
+                ct += int(r.quantity or 0) * int(price)
+            return (feed_t or 0) + (ct or 0)
+        sales_cur = calc_sales(cur_start, None)
+        sales_prev = calc_sales(prev_start, prev_end)
+        def pct(cur, prev):
+            try:
+                return round(((cur - prev) / prev) * 100.0, 1) if prev else (100.0 if cur and not prev else 0.0)
+            except Exception:
+                return 0.0
+        trends = {
+            'sales': pct(sales_cur, sales_prev),
+            'chick_requests': pct(cr_cur, cr_prev),
+            'feed_allocations': pct(fa_cur, fa_prev),
+        }
+
     context = {
+        'filters': filters,
+        'chick_stock': list(chick_stock_qs),
+        'feed_stock': list(feed_stock_qs),
+        'chick_stock_total': chick_stock_total,
+        'feed_stock_total': feed_stock_total,
+    'chick_requests': chick_requests_display,
+    'feed_allocations': feed_allocations_display,
+        'farmers': list(farmers_qs[:1000]),
+        'stats': stats,
+        'chick_type_choices': chick_type_choices,
+        'chick_breed_choices': chick_breed_choices,
+        'feed_types': feed_types,
+        'agents': agents,
+        'farmers_all': farmers_all,
         'total_sales': total_sales,
         'total_chick_requests': total_chick_requests,
         'total_feed_allocations': total_feed_allocations,
@@ -346,11 +541,321 @@ def Reports(request):
         'pending_chick_requests': pending_chick_requests,
         'pending_feed_payments': pending_feed_payments,
         'low_stock_items': low_stock_items,
-        'last_chick_request_date': last_chick_request.request_date.date() if last_chick_request else None,
-    'last_feed_allocation_date': getattr(last_feed_allocation, 'payment_due_date', None) if last_feed_allocation else None,
-        'last_stock_update': last_stock_update.updated_at.date() if last_stock_update else None,
+        'charts': {
+            'activity_labels': activity_labels,
+            'activity_chicks': activity_chicks,
+            'activity_feeds': activity_feeds,
+            'status_mix': status_mix,
+        },
+    'trends': trends,
+    'weekly_summary': weekly_summary,
+    'agent_perf': agent_perf,
     }
     return render(request, 'reports.html', context)
+
+@role_required('manager')
+def reports_export(request):
+    dataset = request.GET.get('dataset')
+    fmt = request.GET.get('format', 'csv')
+
+    # Reuse Reports filters logic to build filtered querysets (without rendering)
+    # We'll factor minimal parts here
+    def parse_date(s):
+        try:
+            return datetime.strptime(s, '%Y-%m-%d').date()
+        except Exception:
+            return None
+    start = parse_date(request.GET.get('start') or '')
+    end = parse_date(request.GET.get('end') or '')
+    status = request.GET.get('status') or ''
+    chick_type = request.GET.get('chick_type') or ''
+    chick_breed = request.GET.get('chick_breed') or ''
+    feed_type = request.GET.get('feed_type') or ''
+    agent = request.GET.get('agent') or ''
+    farmer = request.GET.get('farmer') or ''
+    location = request.GET.get('location') or ''
+    q = request.GET.get('q') or ''
+
+    # Build datasets
+    if dataset == 'chick_stock':
+        qs = ChickStock.objects.all()
+        if chick_type: qs = qs.filter(chick_type=chick_type)
+        if chick_breed: qs = qs.filter(chick_breed=chick_breed)
+        rows = [['Batch','Type','Breed','Age','Price','Qty']]
+        for s in qs.order_by('batch_name'):
+            rows.append([s.batch_name,s.chick_type,s.chick_breed,s.chick_age,s.chick_price,s.stock_quantity])
+        filename = 'chick_stock'
+    elif dataset == 'feed_stock':
+        qs = FeedStock.objects.all()
+        if feed_type: qs = qs.filter(feed_type=feed_type)
+        rows = [['Stock','Feed','Type','Brand','Qty','Unit Price']]
+        for s in qs.order_by('stock_name'):
+            rows.append([s.stock_name,s.feed_name,s.feed_type,s.feed_brand,s.feed_quantity,s.selling_price])
+        filename = 'feed_stock'
+    elif dataset == 'chick_requests':
+        qs = ChickRequest.objects.select_related('farmer','created_by')
+        if start: qs = qs.filter(request_date__date__gte=start)
+        if end: qs = qs.filter(request_date__date__lte=end)
+        if status: qs = qs.filter(status=status)
+        if chick_type: qs = qs.filter(chick_type=chick_type)
+        if chick_breed: qs = qs.filter(chick_breed=chick_breed)
+        if agent: qs = qs.filter(created_by_id=agent)
+        if farmer: qs = qs.filter(farmer_id=farmer)
+        if location: qs = qs.filter(farmer__location__icontains=location)
+        if q: qs = qs.filter(Q(chick_request_id__icontains=q) | Q(farmer__farmer_name__icontains=q))
+        rows = [['Req ID','Farmer','Type','Breed','Qty','Status','Date']]
+        for r in qs.order_by('-request_date'):
+            rows.append([r.chick_request_id, r.farmer.farmer_name, r.chick_type, r.chick_breed, r.quantity, r.status, r.request_date.strftime('%Y-%m-%d %H:%M')])
+        filename = 'chick_requests'
+    elif dataset == 'feed_allocations':
+        qs = FeedAllocation.objects.select_related('chick_request','chick_request__farmer','feed_stock')
+        if start: qs = qs.filter(chick_request__request_date__date__gte=start)
+        if end: qs = qs.filter(chick_request__request_date__date__lte=end)
+        if status: qs = qs.filter(status=status)
+        if feed_type: qs = qs.filter(feed_type=feed_type)
+        if agent: qs = qs.filter(chick_request__created_by_id=agent)
+        if farmer: qs = qs.filter(chick_request__farmer_id=farmer)
+        if location: qs = qs.filter(chick_request__farmer__location__icontains=location)
+        if q: qs = qs.filter(Q(feed_request_id__icontains=q) | Q(chick_request__chick_request_id__icontains=q))
+        rows = [['Feed ID','Req ID','Feed','Brand','Bags','Status','Payment']]
+        for a in qs.order_by('-id'):
+            rows.append([a.feed_request_id, a.chick_request.chick_request_id, a.feed_name, a.feed_brand, a.bags_allocated, a.status, a.payment_status])
+        filename = 'feed_allocations'
+    elif dataset == 'farmers':
+        qs = Customer.objects.all()
+        if start: qs = qs.filter(registration_date__date__gte=start)
+        if end: qs = qs.filter(registration_date__date__lte=end)
+        if location: qs = qs.filter(location__icontains=location)
+        if q: qs = qs.filter(Q(farmer_id__icontains=q) | Q(farmer_name__icontains=q))
+        rows = [['Farmer ID','Name','Gender','Age','Phone','Location','Registered']]
+        for f in qs.order_by('-registration_date'):
+            rows.append([f.farmer_id, f.farmer_name, f.gender, f.age, f.phone_number, f.location, f.registration_date.strftime('%Y-%m-%d %H:%M')])
+        filename = 'farmers'
+    elif dataset == 'agent_performance':
+        # Aggregate from ChickRequest
+        perf = {}
+        qs = ChickRequest.objects.select_related('created_by')
+        if start: qs = qs.filter(request_date__date__gte=start)
+        if end: qs = qs.filter(request_date__date__lte=end)
+        for r in qs:
+            key = getattr(r.created_by, 'username', 'N/A')
+            d = perf.setdefault(key, {'total':0,'approved':0,'rejected':0,'delivered':0})
+            d['total'] += 1
+            if r.status=='approved': d['approved'] += 1
+            if r.status=='rejected': d['rejected'] += 1
+            if r.delivered: d['delivered'] += 1
+        rows = [['Agent','Requests','Approved','Rejected','Delivered']]
+        for k,v in sorted(perf.items()):
+            rows.append([k, v['total'], v['approved'], v['rejected'], v['delivered']])
+        filename = 'agent_performance'
+    elif dataset == 'activity_daily':
+        # Build daily activity counts
+        from collections import OrderedDict
+        qsR = ChickRequest.objects.all()
+        qsA = FeedAllocation.objects.all()
+        if start: qsR = qsR.filter(request_date__date__gte=start)
+        if end: qsR = qsR.filter(request_date__date__lte=end)
+        if start: qsA = qsA.filter(chick_request__request_date__date__gte=start)
+        if end: qsA = qsA.filter(chick_request__request_date__date__lte=end)
+        buckets = OrderedDict()
+        def key(d):
+            return d.strftime('%Y-%m-%d')
+        for r in qsR:
+            buckets[key(r.request_date.date())] = buckets.get(key(r.request_date.date()), {'chicks':0,'feeds':0})
+            buckets[key(r.request_date.date())]['chicks'] += 1
+        for a in qsA:
+            d = a.chick_request.request_date.date()
+            buckets[key(d)] = buckets.get(key(d), {'chicks':0,'feeds':0})
+            buckets[key(d)]['feeds'] += 1
+        rows = [['Date','Chick Requests','Feed Allocations']]
+        for k,v in buckets.items():
+            rows.append([k, v['chicks'], v['feeds']])
+        filename = 'activity_daily'
+    elif dataset == 'activity_weekly':
+        from collections import defaultdict
+        qsR = ChickRequest.objects.all()
+        qsA = FeedAllocation.objects.all()
+        if start: qsR = qsR.filter(request_date__date__gte=start)
+        if end: qsR = qsR.filter(request_date__date__lte=end)
+        if start: qsA = qsA.filter(chick_request__request_date__date__gte=start)
+        if end: qsA = qsA.filter(chick_request__request_date__date__lte=end)
+        wk = defaultdict(lambda: {'chicks':0,'feeds':0})
+        for r in qsR:
+            y, w, _ = r.request_date.isocalendar()
+            wk[(y,w)]['chicks'] += 1
+        for a in qsA:
+            y, w, _ = a.chick_request.request_date.isocalendar()
+            wk[(y,w)]['feeds'] += 1
+        rows = [['Year-Week','Chick Requests','Feed Allocations','Total']]
+        for (y,w), v in sorted(wk.items()):
+            rows.append([f"{y}-W{w:02d}", v['chicks'], v['feeds'], v['chicks']+v['feeds']])
+        filename = 'activity_weekly'
+    elif dataset == 'general':
+        # Build a combined representation using same filters as the page
+        # Reuse minimal parse/query bits from above
+        # Chick stock
+        cs = ChickStock.objects.all()
+        if chick_type: cs = cs.filter(chick_type=chick_type)
+        if chick_breed: cs = cs.filter(chick_breed=chick_breed)
+        chick_stock_rows = [['Batch','Type','Breed','Age','Price','Qty']]
+        for s in cs.order_by('batch_name'):
+            chick_stock_rows.append([s.batch_name,s.chick_type,s.chick_breed,s.chick_age,s.chick_price,s.stock_quantity])
+        # Feed stock
+        fs = FeedStock.objects.all()
+        if feed_type: fs = fs.filter(feed_type=feed_type)
+        feed_stock_rows = [['Stock','Feed','Type','Brand','Qty','Unit Price']]
+        for s in fs.order_by('stock_name'):
+            feed_stock_rows.append([s.stock_name,s.feed_name,s.feed_type,s.feed_brand,s.feed_quantity,s.selling_price])
+        # Chick requests
+        cr = ChickRequest.objects.select_related('farmer','created_by')
+        if start: cr = cr.filter(request_date__date__gte=start)
+        if end: cr = cr.filter(request_date__date__lte=end)
+        if status: cr = cr.filter(status=status)
+        if chick_type: cr = cr.filter(chick_type=chick_type)
+        if chick_breed: cr = cr.filter(chick_breed=chick_breed)
+        if agent: cr = cr.filter(created_by_id=agent)
+        if farmer: cr = cr.filter(farmer_id=farmer)
+        if q: cr = cr.filter(Q(chick_request_id__icontains=q) | Q(farmer__farmer_name__icontains=q))
+        chick_req_rows = [['Req ID','Farmer','Type','Breed','Qty','Status','Date']]
+        for r in cr.order_by('-request_date'):
+            chick_req_rows.append([r.chick_request_id, r.farmer.farmer_name, r.chick_type, r.chick_breed, r.quantity, r.status, r.request_date.strftime('%Y-%m-%d %H:%M')])
+        # Feed allocations
+        fa = FeedAllocation.objects.select_related('chick_request','chick_request__farmer','feed_stock')
+        if start: fa = fa.filter(chick_request__request_date__date__gte=start)
+        if end: fa = fa.filter(chick_request__request_date__date__lte=end)
+        if status: fa = fa.filter(status=status)
+        if feed_type: fa = fa.filter(feed_type=feed_type)
+        if agent: fa = fa.filter(chick_request__created_by_id=agent)
+        if farmer: fa = fa.filter(chick_request__farmer_id=farmer)
+        if q: fa = fa.filter(Q(feed_request_id__icontains=q) | Q(chick_request__chick_request_id__icontains=q))
+        feed_alloc_rows = [['Feed ID','Req ID','Feed','Brand','Bags','Status','Payment']]
+        for a in fa.order_by('-id'):
+            feed_alloc_rows.append([a.feed_request_id, a.chick_request.chick_request_id, a.feed_name, a.feed_brand, a.bags_allocated, a.status, a.payment_status])
+
+        # Agent performance (aggregate across both datasets)
+        perf = {}
+        for r in cr:
+            key = getattr(r.created_by, 'username', 'N/A')
+            d = perf.setdefault(key, {'total':0,'approved':0,'rejected':0,'delivered':0})
+            d['total'] += 1
+            if r.status=='approved': d['approved'] += 1
+            if r.status=='rejected': d['rejected'] += 1
+            if r.delivered: d['delivered'] += 1
+        for a in fa:
+            key = getattr(getattr(a.chick_request, 'created_by', None), 'username', 'N/A')
+            d = perf.setdefault(key, {'total':0,'approved':0,'rejected':0,'delivered':0})
+            d['total'] += 1
+            if a.status=='approved': d['approved'] += 1
+            if a.status=='rejected': d['rejected'] += 1
+            if a.delivered: d['delivered'] += 1
+        agent_rows = [['Agent','Requests','Approved','Rejected','Delivered']]
+        for k,v in sorted(perf.items()):
+            agent_rows.append([k, v['total'], v['approved'], v['rejected'], v['delivered']])
+
+        # Output formats
+        if fmt == 'xlsx':
+            try:
+                from openpyxl import Workbook
+            except Exception:
+                return HttpResponse('Install openpyxl to enable Excel export: pip install openpyxl', content_type='text/plain')
+            wb = Workbook()
+            ws1 = wb.active; ws1.title = 'Chick Stock'
+            for r in chick_stock_rows: ws1.append(r)
+            ws2 = wb.create_sheet('Feed Stock')
+            for r in feed_stock_rows: ws2.append(r)
+            ws3 = wb.create_sheet('Chick Requests')
+            for r in chick_req_rows: ws3.append(r)
+            ws4 = wb.create_sheet('Feed Allocations')
+            for r in feed_alloc_rows: ws4.append(r)
+            ws5 = wb.create_sheet('Agent Performance')
+            for r in agent_rows: ws5.append(r)
+            from io import BytesIO
+            buff = BytesIO(); wb.save(buff); buff.seek(0)
+            resp = HttpResponse(buff.read(), content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+            resp['Content-Disposition'] = 'attachment; filename="general.xlsx"'
+            return resp
+        elif fmt == 'pdf':
+            try:
+                from reportlab.lib.pagesizes import A4
+                from reportlab.pdfgen import canvas
+            except Exception:
+                return HttpResponse('Install reportlab to enable PDF export: pip install reportlab', content_type='text/plain')
+            from io import BytesIO
+            buff = BytesIO(); c = canvas.Canvas(buff, pagesize=A4)
+            width, height = A4; x0, y = 40, height-50
+            def write_section(title, rows):
+                nonlocal y
+                c.setFont('Helvetica-Bold', 12); c.drawString(x0, y, title); y -= 18
+                c.setFont('Helvetica', 10)
+                for row in rows:
+                    line = '  '.join(str(x) for x in row)
+                    c.drawString(x0, y, line[:120]); y -= 14
+                    if y < 60:
+                        c.showPage(); y = height-50
+            write_section('Chick Stock', chick_stock_rows)
+            write_section('Feed Stock', feed_stock_rows)
+            write_section('Chick Requests', chick_req_rows)
+            write_section('Feed Allocations', feed_alloc_rows)
+            write_section('Agent Performance', agent_rows)
+            c.save(); buff.seek(0)
+            resp = HttpResponse(buff.read(), content_type='application/pdf')
+            resp['Content-Disposition'] = 'attachment; filename="general.pdf"'
+            return resp
+        else:
+            return HttpResponseBadRequest('Unknown format')
+    else:
+        return HttpResponseBadRequest('Unknown dataset')
+
+    # Writers per format
+    if fmt == 'csv':
+        import csv
+        resp = HttpResponse(content_type='text/csv')
+        resp['Content-Disposition'] = f'attachment; filename="{filename}.csv"'
+        writer = csv.writer(resp)
+        for row in rows:
+            writer.writerow(row)
+        return resp
+    elif fmt == 'xlsx':
+        try:
+            from openpyxl import Workbook
+        except Exception:
+            return HttpResponse('Install openpyxl to enable Excel export: pip install openpyxl', content_type='text/plain')
+        wb = Workbook()
+        ws = wb.active
+        ws.title = 'Report'
+        for r in rows:
+            ws.append(r)
+        from io import BytesIO
+        buff = BytesIO()
+        wb.save(buff)
+        buff.seek(0)
+        resp = HttpResponse(buff.read(), content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        resp['Content-Disposition'] = f'attachment; filename="{filename}.xlsx"'
+        return resp
+    elif fmt == 'pdf':
+        try:
+            from reportlab.lib.pagesizes import A4
+            from reportlab.pdfgen import canvas
+        except Exception:
+            return HttpResponse('Install reportlab to enable PDF export: pip install reportlab', content_type='text/plain')
+        from io import BytesIO
+        buff = BytesIO()
+        c = canvas.Canvas(buff, pagesize=A4)
+        width, height = A4
+        x0, y = 40, height - 50
+        for i,row in enumerate(rows):
+            line = '  '.join(str(x) for x in row)
+            c.drawString(x0, y, line[:120])
+            y -= 16
+            if y < 60:
+                c.showPage(); y = height - 50
+        c.save()
+        buff.seek(0)
+        resp = HttpResponse(buff.read(), content_type='application/pdf')
+        resp['Content-Disposition'] = f'attachment; filename="{filename}.pdf"'
+        return resp
+    else:
+        return HttpResponseBadRequest('Unknown format')
 
 @role_required('manager')
 def Sales(request):

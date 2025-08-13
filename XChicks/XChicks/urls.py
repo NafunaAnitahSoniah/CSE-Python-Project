@@ -44,6 +44,7 @@ urlpatterns = [
     path('updatefeedstock/<int:stock_id>/', views.UpdateFeedStock, name='Updatefeedstock_edit'),
     path('approvefeedrequest/<int:request_id>/', views.ApproveFeedRequest, name='Approvefeedrequest'),
     path('reports/', views.Reports, name='Reports'),
+    path('reports/export', views.reports_export, name='reports_export'),
     path('sales/', views.Sales, name='Sales'),
     path('deliveries/', views.Deliveries, name='Deliveries'),
     path('deliveries/mark/chick/<int:req_id>/', views.MarkChickDelivered, name='mark_chick_delivered'),
