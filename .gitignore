@@ -1,7 +1,39 @@
+# Virtual Environment
 djenv/
+venv/
+env/
+
+# Database
+*.sqlite3
 XChicks/db.sqlite3
-XChicks/ChicksApp/__pycache__/*
-XChicks/XChicks/__pycache__/settings.cpython-312.pyc
-XChicks/XChicks/__pycache__/urls.cpython-312.pyc
-XChicks/XChicks/__pycache__/urls.cpython-312.pyc
-XChicks/XChicks/__pycache__/urls.cpython-312.pyc
+
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Django stuff
+*.log
+local_settings.py
+db.sqlite3-journal
+media/
+
+# IDE specific files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Environment variables
+.env
+.env.local
+
+# Compiled Python files
+*.pyc
+
+# Migration files
+# */migrations/*.py
+# !*/migrations/__init__.py
+
+# Static files collected
+/static/
