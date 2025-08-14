@@ -8,7 +8,7 @@
         <table class="data-table">
             <thead>
                 <tr>
-                    <th>ID</th><th>Farmer</th><th>Type</th><th>Breed</th><th>Qty</th><th>Period(d)</th><th>Feed</th><th>Pay</th><th>Date</th><th>By</th><th>Channel</th><th>Status</th><th>Approved</th><th>Delivered</th><th>Actions</th>
+                    <th>ID</th><th>Farmer</th><th>Type</th><th>Breed</th><th>Qty</th><th>Feed</th><th>Pay</th><th>Date</th><th>By</th><th>Channel</th><th>Status</th><th>Delivered</th><th>Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -16,25 +16,31 @@
                 <tr>
                     <td>{{ request.chick_request_id }}</td>
                     <td>{{ request.farmer.farmer_name }}</td>
-                    <td>{{ request.farmer_type }}</td>
                     <td>{{ request.chick_type }}</td>
+                    <td>{{ request.chick_breed }}</td>
                     <td>{{ request.quantity }}</td>
-                    <td>{{ request.chick_period }}</td>
+                    
                     <td>{{ request.feed_taken|yesno:'Yes,No' }}</td>
                     <td>{{ request.payment_terms }}</td>
                     <td>{{ request.request_date|date:'Y-m-d H:i' }}</td>
                     <td>{{ request.created_by.username|default:'N/A' }}</td>
                     <td>{{ request.received_through }}</td>
-                    <td><span class="status-badge status-{{ request.status|lower }}">{{ request.status }}</span></td>
-                    <td>{{ request.approved_on|date:'Y-m-d H:i'|default:'-' }}</td>
+                    <td><span class="status-badge status-{{ request.status|lower }}">{{ request.status|title }}</span></td>
                     <td>{{ request.delivered|yesno:'Yes,No' }}</td>
                     <td class="text-small">
-                        <a href="/farmerreview/" class="btn btn-outline btn-small">Farmer</a>
-                        <a href="/deleterequest/{{ request.id }}/" class="btn btn-danger btn-small">Delete</a>
+                        {% if request.status == 'pending' %}
+                        <form method="post" action="/approvechickrequest/{{ request.id }}/" style="display:inline-block;">
+                            {% csrf_token %}
+                            <button type="submit" name="action" value="approve" class="btn btn-success btn-small" onclick="return confirm('Approve this chick request?')"><i class="fas fa-check"></i> Approve</button>
+                            <button type="submit" name="action" value="reject" class="btn btn-danger btn-small" onclick="return confirm('Reject this chick request?')"><i class="fas fa-times"></i> Reject</button>
+                        </form>
+                        {% else %}
+                        <span class="text-muted">No actions</span>
+                        {% endif %}
                     </td>
                 </tr>
                 {% empty %}
-                <tr><td colspan="15">No requests available.</td></tr>
+                <tr><td colspan="14">No requests available.</td></tr>
                 {% endfor %}
             </tbody>
         </table>

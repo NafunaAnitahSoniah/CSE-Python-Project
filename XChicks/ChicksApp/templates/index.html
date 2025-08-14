@@ -5,200 +5,298 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Young4ChickS</title>
+    <title>Young4ChickS - Your Trusted Partner in Poultry Farming</title>
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome for Icons -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <!-- Google Fonts for Modern Typography -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Custom CSS with enhanced purple and green theme -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Fredoka:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <!-- Custom CSS with enhanced cute chick theme -->
     <style>
         :root {
-            --primary-purple: #6a0dad;
-            --light-purple: #b266ff;
-            --primary-green: #2e7d32;
-            --light-green: #66bb6a;
-            --dark-green: #1b5e20;
-            --bg-light: #f8f9fa;
-            --text-dark: #333;
+            --primary-yellow: #FFD700;
+            --light-yellow: #FFF8DC;
+            --orange-accent: #FF8C00;
+            --soft-orange: #FFE4B5;
+            --primary-green: #32CD32;
+            --light-green: #98FB98;
+            --dark-green: #228B22;
+            --bg-cream: #FFFEF7;
+            --text-dark: #2F4F4F;
             --text-light: #fff;
+            --cute-pink: #FFB6C1;
+            --soft-blue: #E6F3FF;
         }
+        
         body {
-            background-color: var(--bg-light);
+            background: linear-gradient(135deg, var(--bg-cream) 0%, var(--light-yellow) 50%, var(--soft-orange) 100%);
             font-family: 'Poppins', sans-serif;
             color: var(--text-dark);
             line-height: 1.6;
+            min-height: 100vh;
         }
+        
         .navbar {
-            background-color: var(--primary-purple);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            background: linear-gradient(90deg, var(--primary-yellow), var(--orange-accent));
+            box-shadow: 0 4px 20px rgba(255, 140, 0, 0.3);
             padding: 1rem 0;
+            border-bottom: 3px solid var(--primary-green);
         }
+        
         .navbar-brand img {
-            height: 50px;
-            transition: transform 0.3s ease;
+            height: 55px;
+            border-radius: 50%;
+            border: 3px solid var(--text-light);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
+        
         .navbar-brand:hover img {
-            transform: scale(1.05);
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
         }
+        
         .nav-link {
-            color: var(--text-light);
+            color: var(--text-dark);
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            transition: color 0.3s ease, transform 0.3s ease;
+            transition: all 0.3s ease;
+            border-radius: 20px;
+            padding: 8px 16px !important;
+            margin: 0 5px;
         }
+        
         .nav-link:hover {
-            color: var(--light-purple);
-            transform: translateY(-2px);
-        }
-        .container-fluid {
-            max-width: 1300px;
-        }
-        .content-container {
-            margin-top: 100px;
-            padding: 2rem;
-            background: linear-gradient(to bottom, rgba(106, 13, 173, 0.05), rgba(46, 125, 50, 0.05));
-            border-radius: 15px;
-        }
-        .masonry-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 25px;
-            padding: 25px;
-        }
-        .masonry-item {
-            background: var(--text-light);
-            border: 2px solid var(--light-purple);
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
-            transition: transform 0.4s ease, box-shadow 0.4s ease;
-        }
-        .masonry-item:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.2);
-        }
-        .masonry-item img {
-            width: 100%;
-            height: 220px;
-            object-fit: cover;
-            transition: transform 0.4s ease;
-        }
-        .masonry-item:hover img {
-            transform: scale(1.05);
-        }
-        .masonry-item-content {
-            padding: 20px;
-            text-align: center;
-        }
-        .masonry-item-content h5 {
-            color: var(--primary-purple);
-            font-weight: 700;
-        }
-        .btn-primary {
+            color: var(--text-light);
             background-color: var(--primary-green);
-            border-color: var(--primary-green);
-            font-weight: 600;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(50, 205, 50, 0.4);
+        }
+        
+        .hero-section {
+            background: linear-gradient(135deg, var(--soft-blue) 0%, var(--light-green) 100%);
+            padding: 80px 0 60px;
+            margin-top: 80px;
             border-radius: 30px;
-            padding: 10px 25px;
-            transition: background-color 0.3s ease, transform 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
         }
+        
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="2" fill="%23FFD700" opacity="0.3"/><circle cx="80" cy="40" r="1.5" fill="%23FF8C00" opacity="0.4"/><circle cx="40" cy="80" r="1" fill="%2332CD32" opacity="0.3"/><circle cx="70" cy="10" r="1.2" fill="%23FFB6C1" opacity="0.4"/></svg>') repeat;
+            animation: float 20s infinite linear;
+            pointer-events: none;
+        }
+        
+        @keyframes float {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+        
+        .hero-title {
+            font-family: 'Fredoka', cursive;
+            font-size: 3.5rem;
+            font-weight: 600;
+            color: var(--primary-green);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        
+        .hero-subtitle {
+            font-size: 1.3rem;
+            color: var(--text-dark);
+            margin-bottom: 30px;
+            font-weight: 400;
+        }
+        
+        .features-section {
+            background: var(--text-light);
+            border-radius: 25px;
+            padding: 50px 30px;
+            margin: 40px 0;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .feature-item {
+            text-align: center;
+            padding: 20px;
+            transition: transform 0.3s ease;
+        }
+        
+        .feature-item:hover {
+            transform: translateY(-5px);
+        }
+        
+        .feature-icon {
+            font-size: 3rem;
+            color: var(--primary-green);
+            margin-bottom: 15px;
+            display: block;
+        }
+        
+        .feature-title {
+            font-family: 'Fredoka', cursive;
+            color: var(--orange-accent);
+            font-weight: 600;
+            font-size: 1.4rem;
+            margin-bottom: 10px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(45deg, var(--primary-green), var(--dark-green));
+            border: none;
+            font-weight: 600;
+            border-radius: 25px;
+            padding: 12px 30px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 15px rgba(34, 139, 34, 0.3);
+        }
+        
         .btn-primary:hover {
-            background-color: var(--dark-green);
-            border-color: var(--dark-green);
+            background: linear-gradient(45deg, var(--dark-green), var(--primary-green));
             transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(34, 139, 34, 0.4);
         }
+        
+        .btn-secondary {
+            background: linear-gradient(45deg, var(--orange-accent), var(--primary-yellow));
+            border: none;
+            color: var(--text-dark);
+            font-weight: 600;
+            border-radius: 25px;
+            padding: 12px 30px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 15px rgba(255, 140, 0, 0.3);
+        }
+        
+        .btn-secondary:hover {
+            background: linear-gradient(45deg, var(--primary-yellow), var(--orange-accent));
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255, 140, 0, 0.4);
+            color: var(--text-dark);
+        }
+        
         .alert-success {
-            background-color: var(--light-green);
-            color: var(--text-light);
+            background: linear-gradient(45deg, var(--light-green), var(--primary-green));
+            color: var(--text-dark);
             border: none;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(50, 205, 50, 0.2);
+            border-left: 5px solid var(--dark-green);
         }
+        
         .alert-danger {
-            background-color: var(--primary-purple);
-            color: var(--text-light);
+            background: linear-gradient(45deg, var(--cute-pink), var(--orange-accent));
+            color: var(--text-dark);
             border: none;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(255, 140, 0, 0.2);
+            border-left: 5px solid var(--orange-accent);
         }
+        
         .form-control, .form-select {
-            border-color: var(--light-purple);
-            border-radius: 10px;
-            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.05);
-            transition: border-color 0.3s ease;
+            border: 2px solid var(--primary-yellow);
+            border-radius: 15px;
+            padding: 12px 15px;
+            transition: all 0.3s ease;
+            background-color: var(--light-yellow);
         }
+        
         .form-control:focus, .form-select:focus {
             border-color: var(--primary-green);
-            box-shadow: 0 0 0 0.25rem rgba(46, 125, 50, 0.25);
+            box-shadow: 0 0 0 0.25rem rgba(50, 205, 50, 0.25);
+            background-color: var(--text-light);
         }
+        
         .form-label {
             font-weight: 600;
-            color: var(--primary-purple);
+            color: var(--orange-accent);
+            font-family: 'Fredoka', cursive;
         }
-        @media (max-width: 992px) {
-            .masonry-grid {
-                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            }
-        }
-        @media (max-width: 576px) {
-            .masonry-grid {
-                grid-template-columns: 1fr;
-            }
-            .content-container {
-                margin-top: 80px;
-                padding: 1.5rem;
-            }
-        }
+        
         footer {
-            background: linear-gradient(to top, var(--primary-green), var(--light-green));
+            background: linear-gradient(135deg, var(--primary-green), var(--dark-green));
             color: var(--text-light);
-            padding: 40px 0;
-            text-align: center;
-            position: relative;
-            bottom: 0;
-            width: 100%;
-            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+            padding: 50px 0 30px;
+            margin-top: 60px;
+            border-radius: 30px 30px 0 0;
+            box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.1);
         }
+        
         footer h5 {
-            color: var(--primary-purple);
-            font-weight: 700;
-            margin-bottom: 15px;
+            font-family: 'Fredoka', cursive;
+            color: var(--primary-yellow);
+            font-weight: 600;
+            margin-bottom: 20px;
         }
+        
         footer a {
-            color: var(--light-purple);
+            color: var(--light-yellow);
             text-decoration: none;
             font-weight: 500;
-            transition: color 0.3s ease;
+            transition: all 0.3s ease;
         }
+        
         footer a:hover {
-            color: var(--text-light);
+            color: var(--primary-yellow);
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
         }
-        footer .social-icon {
-            font-size: 1.5rem;
+        
+        .social-icon {
+            font-size: 1.8rem;
             margin: 0 15px;
+            transition: all 0.3s ease;
         }
-        footer hr {
-            border-color: var(--light-purple);
-            opacity: 0.5;
+        
+        .social-icon:hover {
+            transform: scale(1.2) rotate(10deg);
         }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
         }
-        .content-container {
-            animation: fadeIn 1s ease-out;
+        
+        .bounce-animation {
+            animation: bounce 2s infinite;
+        }
+        
+        @media (max-width: 992px) {
+            .hero-title {
+                font-size: 2.8rem;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .hero-title {
+                font-size: 2.2rem;
+            }
+            .hero-section {
+                margin-top: 70px;
+                padding: 60px 0 40px;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- Enhanced Navbar with Icons -->
+    <!-- Enhanced Navbar with cute styling -->
     <nav class="navbar navbar-expand-lg fixed-top">
         <div class="container-fluid">
             <a class="navbar-brand" href="{% url 'home' %}">
-                <img src="{% static 'images/logo.png' %}" alt="Young4ChickS Logo">
+                <img src="{% static 'images/logo.jpg' %}" alt="Young4ChickS Logo">
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -216,11 +314,10 @@
                         <li class="nav-item"><a class="nav-link" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt me-1"></i> Logout</a></li>
                     {% else %}
                         <li class="nav-item"><a class="nav-link" href="{% url 'login' %}"><i class="fas fa-sign-in-alt me-1"></i> Login</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{% url 'registerfarmer' %}"><i class="fas fa-user-plus me-1"></i> Register</a></li>
                     {% endif %}
                     <li class="nav-item">
                         <a class="nav-link" href="https://twitter.com/young4chicks" target="_blank">
-                            <i class="fab fa-twitter" style="font-size: 1.2rem;"></i>
+                            <i class="fab fa-twitter"></i>
                         </a>
                     </li>
                 </ul>
@@ -229,10 +326,10 @@
     </nav>
 
     <!-- Main Content with Enhanced Container -->
-    <div class="container-fluid content-container">
+    <div class="container-fluid" style="max-width: 1300px;">
         {% if messages %}
             {% for message in messages %}
-                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert" style="margin-top: 100px;">
                     {% if message.tags == 'success' %}
                         <i class="fas fa-check-circle me-2"></i>
                     {% else %}
@@ -243,36 +340,154 @@
                 </div>
             {% endfor %}
         {% endif %}
+        
         {% block content %}
+        <!-- Hero Section -->
+        <div class="hero-section">
+            <div class="container text-center">
+                <h1 class="hero-title bounce-animation">🐣 Welcome to Young4ChickS! 🐣</h1>
+                <p class="hero-subtitle">Your trusted partner in raising healthy, happy chicks and building a sustainable poultry farming future</p>
+                <div class="d-flex justify-content-center gap-3 flex-wrap">
+                    <a href="{% url 'login' %}" class="btn btn-primary btn-lg">
+                        <i class="fas fa-sign-in-alt me-2"></i>Login
+                    </a>
+                    <a href="#features" class="btn btn-secondary btn-lg">
+                        <i class="fas fa-info-circle me-2"></i>Learn More
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Features Section -->
+        <div class="container">
+            <div class="features-section" id="features">
+                <div class="text-center mb-5">
+                    <h2 class="hero-title" style="font-size: 2.5rem;">🌈 Why Choose Young4ChickS? 🌈</h2>
+                    <p class="hero-subtitle">We're committed to providing the best start for your poultry farming journey</p>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-4 feature-item">
+                        <i class="fas fa-heart feature-icon"></i>
+                        <h4 class="feature-title">Healthy & Happy Chicks</h4>
+                        <p>Our chicks are raised with love and care, ensuring they're healthy, vaccinated, and ready to thrive in their new homes. We prioritize their wellbeing from day one.</p>
+                    </div>
+                    
+                    <div class="col-md-4 feature-item">
+                        <i class="fas fa-leaf feature-icon"></i>
+                        <h4 class="feature-title">Sustainable Practices</h4>
+                        <p>We believe in environmentally friendly farming methods that benefit both the chicks and the planet. Our sustainable approach ensures a better future for all.</p>
+                    </div>
+                    
+                    <div class="col-md-4 feature-item">
+                        <i class="fas fa-users feature-icon"></i>
+                        <h4 class="feature-title">Expert Support</h4>
+                        <p>Our team of experienced poultry specialists is always ready to help you succeed. From choosing the right chicks to ongoing care advice, we're here for you.</p>
+                    </div>
+                </div>
+                
+                <div class="row mt-4">
+                    <div class="col-md-4 feature-item">
+                        <i class="fas fa-shield-alt feature-icon"></i>
+                        <h4 class="feature-title">Quality Guarantee</h4>
+                        <p>We stand behind the quality of our chicks with comprehensive health guarantees and ongoing support to ensure your farming success.</p>
+                    </div>
+                    
+                    <div class="col-md-4 feature-item">
+                        <i class="fas fa-truck feature-icon"></i>
+                        <h4 class="feature-title">Safe Delivery</h4>
+                        <p>Our specialized transportation ensures your chicks arrive safely and stress-free, ready to start their new life on your farm.</p>
+                    </div>
+                    
+                    <div class="col-md-4 feature-item">
+                        <i class="fas fa-graduation-cap feature-icon"></i>
+                        <h4 class="feature-title">Educational Resources</h4>
+                        <p>Access our comprehensive library of guides, tips, and training materials to help you become a successful poultry farmer.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Call to Action Section -->
+        <div class="container my-5">
+            <div class="text-center p-5" style="background: linear-gradient(135deg, var(--soft-blue), var(--light-green)); border-radius: 25px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);">
+                <h3 class="hero-title" style="font-size: 2.2rem;">🚀 Ready to Start Your Poultry Adventure? 🚀</h3>
+                <p class="hero-subtitle">Join thousands of successful farmers who trust Young4ChickS for their poultry needs</p>
+                <div class="d-flex justify-content-center gap-3 flex-wrap mt-4">
+                    <a href="{% url 'login' %}" class="btn btn-primary btn-lg">
+                        <i class="fas fa-sign-in-alt me-2"></i>Login to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
         {% endblock %}
     </div>
 
     <!-- Bootstrap 5 JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JavaScript -->
+    <script>
+        function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+        
+        // Add some interactive animations
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animate cards on scroll
+            const cards = document.querySelectorAll('.chick-card');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            });
+            
+            cards.forEach(card => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(50px)';
+                card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                observer.observe(card);
+            });
+        });
+    </script>
 </body>
 
 <footer>
     <div class="container">
         <div class="row gy-4">
             <div class="col-12 col-md-4">
-                <h5>About Us</h5>
-                <p>Young4ChickS is dedicated to empowering young farmers with quality chicks and feeds. Join us in building a sustainable future!</p>
+                <h5>🐣 About Young4ChickS</h5>
+                <p>We're passionate about empowering young farmers with the healthiest, happiest chicks and the knowledge to succeed. Our mission is to build a sustainable future through responsible poultry farming, one chick at a time.</p>
             </div>
             <div class="col-12 col-md-4">
-                <h5>Contact</h5>
+                <h5>📞 Get in Touch</h5>
                 <p><i class="fas fa-envelope me-2"></i> Email: info@young4chicks.com</p>
                 <p><i class="fas fa-phone me-2"></i> Phone: +254 712 345 678</p>
                 <p><i class="fas fa-map-marker-alt me-2"></i> Address: Nairobi, Kenya</p>
+                <p><i class="fas fa-clock me-2"></i> Hours: Mon-Fri 8AM-6PM</p>
             </div>
             <div class="col-12 col-md-4">
-                <h5>Follow Us</h5>
-                <a href="https://x.com/young4chicks" target="_blank" class="social-icon"><i class="fab fa-x-twitter"></i></a>
-                <a href="https://facebook.com/young4chicks" target="_blank" class="social-icon"><i class="fab fa-facebook-f"></i></a>
-                <a href="https://instagram.com/young4chicks" target="_blank" class="social-icon"><i class="fab fa-instagram"></i></a>
+                <h5>🌟 Follow Our Journey</h5>
+                <div class="mb-3">
+                    <a href="https://x.com/young4chicks" target="_blank" class="social-icon"><i class="fab fa-x-twitter"></i></a>
+                    <a href="https://facebook.com/young4chicks" target="_blank" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+                    <a href="https://instagram.com/young4chicks" target="_blank" class="social-icon"><i class="fab fa-instagram"></i></a>
+                </div>
+                <p>Stay updated with our latest chick arrivals, farming tips, and success stories from our community!</p>
             </div>
         </div>
-        <hr>
-        <p>&copy; 2025 Young4ChickS. All rights reserved. | Designed by Nafuna Anitah Soniah</p>
+        <hr style="border-color: var(--primary-yellow); opacity: 0.3; margin: 30px 0 20px;">
+        <div class="text-center">
+            <p>&copy; 2025 Young4ChickS. All rights reserved. | Designed with 💛 by Nafuna Anitah Soniah</p>
+            <p style="font-size: 0.9rem; opacity: 0.8;">Raising dreams, one chick at a time 🐥✨</p>
+        </div>
     </div>
 </footer>
 </html>
+

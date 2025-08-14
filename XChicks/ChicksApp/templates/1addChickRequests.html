@@ -27,6 +27,16 @@
             </select>
         </div>
         <div class="form-group">
+            <label for="feed_name">Select Approved Feed (optional):</label>
+            <select class="form-control" name="feed_name" id="feed_name">
+                <option value="">None</option>
+                {% for fa in approved_feeds %}
+                <option value="{{ fa.feed_name }}">{{ fa.feed_name }} ({{ fa.feed_type }} - {{ fa.feed_brand }})</option>
+                {% endfor %}
+            </select>
+            <small class="form-help">Only feeds from your approved feed allocations are listed.</small>
+        </div>
+        <div class="form-group">
             <label for="chick_type">Chick Type:</label>
             <select class="form-control" name="chick_type" id="chick_type" required>
                 <option value="">Select Type</option>
@@ -35,21 +45,17 @@
             </select>
         </div>
         <div class="form-group">
-            <label for="chick_breed">Chick Breed:</label>
+            <label for="chick_breed">Chick Breed (shows available stock):</label>
             <select class="form-control" name="chick_breed" id="chick_breed" required>
                 <option value="">Select Breed</option>
-                <option value="local">Local</option>
-                <option value="exotic">Exotic</option>
             </select>
+            <small id="breedHint" class="form-help"></small>
         </div>
         <div class="form-group">
             <label for="quantity">Quantity:</label>
             <input class="form-control" type="number" name="quantity" id="quantity" min="1" required>
         </div>
-        <div class="form-group">
-            <label for="chick_period">Chick Period (days):</label>
-            <input class="form-control" type="number" name="chick_period" id="chick_period" min="1" required>
-        </div>
+    {# Chick Period removed as per requirements #}
         <div class="form-group">
             <label for="feed_taken">Feed Taken:</label>
             <select class="form-control" name="feed_taken" id="feed_taken" required>
@@ -81,4 +87,41 @@
         </div>
     </form>
 </section>
+{% block extra_js %}
+{{ stock_counts|json_script:"stockCounts" }}
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+    const typeSel = document.getElementById('chick_type');
+    const breedSel = document.getElementById('chick_breed');
+    const hint = document.getElementById('breedHint');
+    // stock map from context
+    const stock = JSON.parse(document.getElementById('stockCounts').textContent);
+    function refreshBreeds(){
+        const t = (typeSel.value||'').toLowerCase();
+        breedSel.innerHTML = '<option value="">Select Breed</option>';
+        if(!t || !stock[t]){ hint.textContent=''; return; }
+        const localCount = stock[t].local||0;
+        const exoticCount = stock[t].exotic||0;
+        if(localCount>0){
+            const opt = document.createElement('option');
+            opt.value='local';
+            opt.textContent=`Local — available: ${localCount}`;
+            breedSel.appendChild(opt);
+        }
+        if(exoticCount>0){
+            const opt = document.createElement('option');
+            opt.value='exotic';
+            opt.textContent=`Exotic — available: ${exoticCount}`;
+            breedSel.appendChild(opt);
+        }
+        if(localCount===0 && exoticCount===0){
+            hint.textContent = 'No stock available for the selected type.';
+        } else {
+            hint.textContent = '';
+        }
+    }
+    typeSel && typeSel.addEventListener('change', refreshBreeds);
+});
+</script>
+{% endblock %}
 {% endblock %}

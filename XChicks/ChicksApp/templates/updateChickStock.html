@@ -39,11 +39,7 @@
                             </option>
                         </select>
                     </div>
-                    <div class="form-group mb-3">
-                        <label for="chick_age">Chick Age (days)</label>
-                        <input type="number" class="form-control" id="chick_age" name="chick_age"
-                            value="{{ chickstock.chick_age }}" min="1" required>
-                    </div>
+                    {# Chick Age removed from editable form; kept in model with default/previous value #}
                     <div class="form-group mb-3">
                         <label for="chick_price">Chick Price (UgSh)</label>
                         <input type="number" class="form-control" id="chick_price" name="chick_price"

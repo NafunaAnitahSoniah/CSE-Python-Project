@@ -20,12 +20,14 @@
                     <th>Amount Due (UgSh)</th>
                     <th>Payment Due Date</th>
                     <th>Payment Status</th>
+                    <th>Request Status</th>
+                    <th>Delivered</th>
                     <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
                 {% for allocation in allocations %}
-                <tr class="status-{{ allocation.payment_status|lower }}">
+                <tr>
                     <td data-label="Feed Request ID">{{ allocation.feed_request_id }}</td>
                     <td data-label="Feed Name">{{ allocation.feed_name }}</td>
                     <td data-label="Feed Type">{{ allocation.feed_type }}</td>
@@ -35,19 +37,33 @@
                     <td data-label="Amount Due (UgSh)">{{ allocation.amount_due }}</td>
                     <td data-label="Payment Due Date">{{ allocation.payment_due_date|date:'Y-m-d' }}</td>
                     <td data-label="Payment Status">
-                        <span class="badge badge-{{ allocation.payment_status|lower }}">{{ allocation.payment_status }}</span>
+                        <span class="status-badge status-{{ allocation.payment_status|lower }}">{{ allocation.payment_status|title }}</span>
                     </td>
+                                        <td data-label="Request Status">
+                                                <span class="status-badge status-{{ allocation.status|lower }}">{{ allocation.status|title }}</span>
+                                        </td>
+                                        <td data-label="Delivered">
+                                                {% if allocation.delivered %}
+                                                    <span class="status-badge status-approved">Yes</span>
+                                                {% else %}
+                                                    <span class="status-badge status-rejected">No</span>
+                                                {% endif %}
+                                        </td>
                     <td data-label="Actions">
-                        {% if allocation.payment_status == 'pending' %}
-                        <a href="#" class="btn btn-danger btn-sm"><i class="fas fa-times"></i> Cancel</a>
+                        {% if allocation.status == 'pending' %}
+                        <span class="text-muted">Awaiting manager approval</span>
+                        {% elif allocation.status == 'approved' %}
+                        <span class="text-success">✓ Approved - Payment: {{ allocation.payment_status|title }}</span>
+                        {% elif allocation.status == 'rejected' %}
+                        <span class="text-danger">✗ Rejected by manager</span>
                         {% else %}
-                        <span class="text-muted">No actions</span>
+                        <span class="text-muted">No actions available</span>
                         {% endif %}
                     </td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="10" class="text-center">No feed requests available.</td>
+                    <td colspan="11" class="text-center">No feed requests available.</td>
                 </tr>
                 {% endfor %}
             </tbody>

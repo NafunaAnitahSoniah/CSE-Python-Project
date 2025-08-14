@@ -17,7 +17,7 @@
                     <th>Chick Type</th>
                     <th>Chick Breed</th>
                     <th>Quantity</th>
-                    <th>Chick Period (days)</th>
+                    
                     <th>Feed Taken</th>
                     <th>Payment Terms</th>
                     <th>Request Date</th>
@@ -30,14 +30,14 @@
             </thead>
             <tbody>
                 {% for request in chick_requests %}
-                <tr class="status-{{ request.status|lower }}">
+                <tr>
                     <td data-label="Request ID">{{ request.chick_request_id }}</td>
                     <td data-label="Farmer">{{ request.farmer.farmer_name }}</td>
                     <td data-label="Farmer Type">{{ request.farmer_type }}</td>
                     <td data-label="Chick Type">{{ request.chick_type }}</td>
                     <td data-label="Chick Breed">{{ request.chick_breed }}</td>
                     <td data-label="Quantity">{{ request.quantity }}</td>
-                    <td data-label="Chick Period (days)">{{ request.chick_period }}</td>
+                    
                     <td data-label="Feed Taken">{{ request.feed_taken|yesno:"Yes,No" }}</td>
                     <td data-label="Payment Terms">{{ request.payment_terms }}</td>
                     <td data-label="Request Date">{{ request.request_date|date:'Y-m-d H:i' }}</td>
@@ -46,7 +46,11 @@
                         <span class="badge badge-{{ request.status|lower }}">{{ request.status }}</span>
                     </td>
                     <td data-label="Approved On">{{ request.approved_on|date:'Y-m-d H:i'|default:"N/A" }}</td>
-                    <td data-label="Delivered">{{ request.delivered|yesno:"Yes,No" }}</td>
+                    <td data-label="Delivered">
+                        <span class="status-badge {% if request.delivered %}status-approved{% else %}status-rejected{% endif %}">
+                            {{ request.delivered|yesno:"Yes,No" }}
+                        </span>
+                    </td>
                     <td data-label="Actions">
                         {% if request.status == 'pending' %}
                         <a href="/deleterequest/{{ request.id }}/" class="btn btn-danger btn-sm"><i class="fas fa-trash"></i> Delete</a>

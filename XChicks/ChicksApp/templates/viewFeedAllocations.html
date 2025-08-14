@@ -1,13 +1,27 @@
 {% extends 'base_manager.html' %}
 {% block title %}Feed Allocations | Young4ChickS{% endblock %}
 {% block content %}
-<header class="page-header"><h1>Feed Allocations</h1></header>
+<header class="page-header">
+    <h1>Feed Allocations</h1>
+</header>
 <div class="table-card fade-in">
     <h4><i class="fas fa-seedling"></i> Overview</h4>
     <div class="table-responsive">
         <table class="data-table">
             <thead>
-                <tr><th>ID</th><th>Name</th><th>Type</th><th>Brand</th><th>Chick Req</th><th>Bags</th><th>Due (KSh)</th><th>Due Date</th><th>Status</th><th>Actions</th></tr>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>Brand</th>
+                    <th>Chick Req</th>
+                    <th>Bags</th>
+                    <th>Due (UGX)</th>
+                    <th>Due Date</th>
+                    <th>Payment Status</th>
+                    <th>Request Status</th>
+                    <th>Actions</th>
+                </tr>
             </thead>
             <tbody>
                 {% for allocation in allocations %}
@@ -20,11 +34,30 @@
                     <td>{{ allocation.bags_allocated }}</td>
                     <td>{{ allocation.amount_due }}</td>
                     <td>{{ allocation.payment_due_date|date:'Y-m-d' }}</td>
-                    <td><span class="status-badge status-{{ allocation.payment_status|lower }}">{{ allocation.payment_status }}</span></td>
-                    <td><a href="/reviewfarmer/{{ allocation.chick_request.farmer.id }}/" class="btn btn-outline btn-small">Farmer</a></td>
+                    <td><span class="status-badge status-{{ allocation.payment_status|lower }}">{{ allocation.payment_status|title }}</span></td>
+                    <td><span class="status-badge status-{{ allocation.status|lower }}">{{ allocation.status|title }}</span></td>
+                    <td>
+                        {% if allocation.status == 'pending' %}
+                        <form method="post" action="/approvefeedrequest/{{ allocation.id }}/" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" name="action" value="approve" class="btn btn-success btn-sm"
+                                onclick="return confirm('Approve this feed request?')">
+                                <i class="fas fa-check"></i> Approve
+                            </button>
+                            <button type="submit" name="action" value="reject" class="btn btn-danger btn-sm"
+                                onclick="return confirm('Reject this feed request?')">
+                                <i class="fas fa-times"></i> Reject
+                            </button>
+                        </form>
+                        {% else %}
+                        <span class="text-muted">No actions available</span>
+                        {% endif %}
+                    </td>
                 </tr>
                 {% empty %}
-                <tr><td colspan="10">No feed allocations available.</td></tr>
+                <tr>
+                    <td colspan="11">No feed allocations available.</td>
+                </tr>
                 {% endfor %}
             </tbody>
         </table>

@@ -10,23 +10,15 @@
     <form method="post" class="form-grid">
         {% csrf_token %}
         <div class="form-group">
-            <label for="feed_name">Feed Name:</label>
-            <input class="form-control" type="text" name="feed_name" id="feed_name" maxlength="25" required>
-        </div>
-        <div class="form-group">
-            <label for="feed_type">Feed Type:</label>
-            <select class="form-control" name="feed_type" id="feed_type" required>
-                <option value="">Select Type</option>
-                <option value="starter">Starter</option>
-                <option value="grower">Grower</option>
-                <option value="finisher">Finisher</option>
-                <option value="layer">Layer</option>
-                <option value="broiler">Broiler</option>
+            <label for="feed_stock">Select Feed Stock:</label>
+            <select class="form-control" name="feed_stock" id="feed_stock" required>
+                <option value="">Select Feed Stock</option>
+                {% for stock in feed_stocks %}
+                <option value="{{ stock.id }}" data-price="{{ stock.selling_price }}">
+                    {{ stock.feed_name }} - {{ stock.feed_type }} ({{ stock.feed_brand }}) - Available: {{ stock.feed_quantity }} bags
+                </option>
+                {% endfor %}
             </select>
-        </div>
-        <div class="form-group">
-            <label for="feed_brand">Feed Brand:</label>
-            <input class="form-control" type="text" name="feed_brand" id="feed_brand" maxlength="25" required>
         </div>
         <div class="form-group">
             <label for="chick_request">Chick Request:</label>

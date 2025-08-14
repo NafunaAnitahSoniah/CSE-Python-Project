@@ -1,15 +1,29 @@
 {% extends 'base_manager.html' %}
 {% block title %}Feed Stock | Young4ChickS{% endblock %}
 {% block content %}
-<header class="page-header"><h1>Feed Stock</h1></header>
-<div class="mb-2"><a href="/updatefeedstock/" class="btn btn-primary"><i class="fas fa-pen"></i> Update Feed Stock</a></div>
+<header class="page-header">
+    <h1>Feed Stock</h1>
+</header>
+<div class="mb-2"><a href="/updatefeedstock/" class="btn btn-primary"><i class="fas fa-plus"></i> Add Feed Stock</a>
+</div>
 <div class="table-card fade-in">
     <h4><i class="fas fa-seedling"></i> Inventory</h4>
     <div class="table-responsive">
         <table class="data-table">
             <thead>
                 <tr>
-                    <th>Stock</th><th>Name</th><th>Type</th><th>Brand</th><th>Qty</th><th>Expiry</th><th>Buy Price</th><th>Sell Price</th><th>Supplier</th><th>Contact</th><th>Updated</th>
+                    <th>Stock</th>
+                    <th>Name</th>
+                    <th>Type</th>
+                    <th>Brand</th>
+                    <th>Qty</th>
+                    <th>Expiry</th>
+                    <th>Buy Price</th>
+                    <th>Sell Price</th>
+                    <th>Supplier</th>
+                    <th>Contact</th>
+                    <th>Updated</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -26,9 +40,16 @@
                     <td>{{ stock.supplier }}</td>
                     <td>{{ stock.supplier_contact }}</td>
                     <td>{{ stock.updated_at|date:'Y-m-d H:i' }}</td>
+                    <td>
+                        <a href="/updatefeedstock/{{ stock.id }}/" class="btn btn-secondary btn-sm">
+                            <i class="fas fa-edit"></i> Update
+                        </a>
+                    </td>
                 </tr>
                 {% empty %}
-                <tr><td colspan="11">No feed stock available.</td></tr>
+                <tr>
+                    <td colspan="12">No feed stock available.</td>
+                </tr>
                 {% endfor %}
             </tbody>
         </table>

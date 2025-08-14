@@ -11,25 +11,41 @@
   <title>{{ title }}</title>
 
   <!-- Bootstrap & Font Awesome -->
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet" />
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.1.0/css/bootstrap.min.css" rel="stylesheet" />
-
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Fredoka:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --primary-yellow: #FFD700;
+      --light-yellow: #FFF8DC;
+      --orange-accent: #FF8C00;
+      --soft-orange: #FFE4B5;
+      --primary-green: #32CD32;
+      --light-green: #98FB98;
+      --dark-green: #228B22;
+      --bg-cream: #FFFEF7;
+      --text-dark: #2F4F4F;
+      --text-light: #fff;
+      --cute-pink: #FFB6C1;
+      --soft-blue: #E6F3FF;
+    }
+
     body {
-      background-color: #f8f9fa;
-      font-family: 'Arial', sans-serif;
+      background: linear-gradient(135deg, var(--bg-cream) 0%, var(--light-yellow) 50%, var(--soft-orange) 100%);
+      font-family: 'Poppins', sans-serif;
+      color: var(--text-dark);
+      line-height: 1.6;
+      min-height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
-      min-height: 100vh;
     }
 
     .form-container {
-      background: #fff;
-      border: 1px solid #b266ff;
-      border-radius: 10px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      padding: 40px 30px;
+      background: var(--text-light);
+      border-radius: 25px;
+      padding: 40px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
       width: 100%;
       max-width: 450px;
     }
@@ -37,7 +53,8 @@
     .form-container h2 {
       text-align: center;
       margin-bottom: 30px;
-      color: #6a0dad;
+      color: var(--primary-green);
+      font-family: 'Fredoka', cursive;
       font-weight: bold;
     }
 
@@ -51,58 +68,54 @@
       top: 50%;
       left: 12px;
       transform: translateY(-50%);
-      color: #6a0dad;
+      color: var(--primary-green);
     }
 
     .form-control {
       padding-left: 40px;
-      border-radius: 8px;
-      border: 1px solid #b266ff;
+      border-radius: 15px;
+      border: 2px solid var(--primary-yellow);
+      background-color: var(--light-yellow);
+      transition: all 0.3s ease;
+    }
+
+    .form-control:focus {
+      border-color: var(--primary-green);
+      box-shadow: 0 0 0 0.25rem rgba(50, 205, 50, 0.25);
+      background-color: var(--text-light);
     }
 
     .btn-primary {
-      background-color: #2e7d32;
-      border-color: #2e7d32;
+      background: linear-gradient(45deg, var(--primary-green), var(--dark-green));
+      border: none;
+      font-weight: 600;
+      border-radius: 25px;
+      padding: 12px 30px;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      box-shadow: 0 4px 15px rgba(34, 139, 34, 0.3);
       width: 100%;
-      padding: 12px;
-      font-size: 1rem;
-      font-weight: 500;
     }
 
     .btn-primary:hover {
-      background-color: #1b5e20;
-      border-color: #1b5e20;
+      background: linear-gradient(45deg, var(--dark-green), var(--primary-green));
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(34, 139, 34, 0.4);
     }
 
-    .error-message {
-      display: none;
-      color: #721c24;
-      background-color: #f8d7da;
-      padding: 10px;
-      border-radius: 5px;
-      margin-top: 10px;
-      font-size: 0.9rem;
-    }
-
-    footer {
-      position: absolute;
-      bottom: 0;
-      width: 100%;
-      background-color: #68b86c;
-      color: #fff;
-      padding: 15px 0;
-      text-align: center;
-    }
-
-    footer p {
-      color: #6a0dad;
-      margin: 0;
+    .alert-danger {
+      background: linear-gradient(45deg, var(--cute-pink), var(--orange-accent));
+      color: var(--text-dark);
+      border: none;
+      border-radius: 15px;
+      box-shadow: 0 4px 15px rgba(255, 140, 0, 0.2);
+      border-left: 5px solid var(--orange-accent);
     }
   </style>
 </head>
 
 <body>
-  {% block content %}
   <div class="form-container">
     <h2>Login</h2>
     <form method="post" id="login-form">
@@ -129,9 +142,6 @@
       <div class="form-group">
         <i class="fas fa-lock"></i>
         {% render_field form.password class="form-control" placeholder="Password" %}
-        <div id="password-error" class="error-message">
-          Password must be at least 8 characters.
-        </div>
         {% if form.password.errors %}
           <div class="text-danger small">{% for e in form.password.errors %}{{ e }}{% endfor %}</div>
         {% endif %}
@@ -140,25 +150,6 @@
       <button type="submit" class="btn btn-primary mt-3">Log In</button>
     </form>
   </div>
-  {% endblock %}
-
-  <footer>
-    <p>&copy; 2025 Young4ChickS. All rights reserved. | Designed by Nafuna Anitah Soniah</p>
-  </footer>
-
-  <script>
-    document.getElementById('login-form').addEventListener('submit', function (e) {
-      const passwordInput = document.querySelector('input[type="password"]');
-      const errorMessage = document.getElementById('password-error');
-
-      if (passwordInput && passwordInput.value.length < 8) {
-        e.preventDefault();
-        errorMessage.style.display = 'block';
-      } else {
-        errorMessage.style.display = 'none';
-      }
-    });
-  </script>
 </body>
 
 </html>
