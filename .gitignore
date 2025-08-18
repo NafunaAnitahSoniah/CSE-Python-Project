@@ -1,4 +1,10 @@
+# Virtual Environment
 djenv/
+venv/
+env/
+
+# Database
+*.sqlite3
 XChicks/db.sqlite3
 XChicks/ChicksApp/__pycache__/*
 XChicks/XChicks/__pycache__/settings.cpython-312.pyc
