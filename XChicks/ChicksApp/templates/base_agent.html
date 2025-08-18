@@ -2,48 +2,64 @@
 {% load widget_tweaks %}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>{% block title %}Sales Agent | Young4ChickS{% endblock %}</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <link rel="stylesheet" href="{% static 'css/design.css' %}">
-  <link rel="stylesheet" href="{% static 'css/agent-theme.css' %}">
+  <link rel="stylesheet" href="{% static 'css/manager-theme.css' %}">
   {% block extra_head %}{% endblock %}
 </head>
+
 <body>
-<div class="mobile-bar"> <button id="menuToggle" aria-label="Toggle navigation"><i class="fas fa-bars"></i></button> <strong>Young4ChickS</strong></div>
-<div class="layout-wrapper">
-  <aside class="sidebar" id="sidebar">
-  <div class="brand"><img src="{% static 'images/logo.jpg' %}" alt="Logo"><strong>Young4ChickS</strong></div>
-    <ul class="nav-vertical">
-      <li><a href="/salesagentdashboard/" class="{% if '/salesagentdashboard' in request.path %}active{% endif %}"><i class="fas fa-gauge"></i> Dashboard</a></li>
-      <li><a href="/addchickrequest/" class="{% if '/addchickrequest' in request.path %}active{% endif %}"><i class="fas fa-plus"></i> Chick Request</a></li>
-      <li><a href="/addfeedrequest/" class="{% if '/addfeedrequest' in request.path %}active{% endif %}"><i class="fas fa-plus"></i> Feed Request</a></li>
-      <li><a href="/registerfarmer/" class="{% if '/registerfarmer' in request.path %}active{% endif %}"><i class="fas fa-user-plus"></i> Register Farmer</a></li>
-      <li><a href="/salesagentchickrequests/" class="{% if '/salesagentchickrequests' in request.path %}active{% endif %}"><i class="fas fa-list"></i> My Chick Requests</a></li>
-      <li><a href="/salesagentfeedrequests/" class="{% if '/salesagentfeedrequests' in request.path %}active{% endif %}"><i class="fas fa-seedling"></i> My Feed Requests</a></li>
-    </ul>
-    <div class="sidebar-footer">
-      <form action="/logout/" method="post">{% csrf_token %}<button class="btn btn-danger btn-logout"><i class="fas fa-right-from-bracket"></i> Logout</button></form>
-    </div>
-  </aside>
-  <main class="main">
-    {% if messages %}
+  <div class="mobile-bar"> <button id="menuToggle" aria-label="Toggle navigation"><i class="fas fa-bars"></i></button>
+    <strong>Young4ChickS</strong></div>
+  <div class="layout-wrapper">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand"><img src="{% static 'images/logo.jpg' %}" alt="Logo"><strong>Young4ChickS</strong></div>
+      <ul class="nav-vertical">
+        <li><a href="/" class="{% if request.path == '/' %}active{% endif %}"><i class="fas fa-home"></i> Home</a></li>
+        <li><a href="/salesagentdashboard/" class="{% if '/salesagentdashboard' in request.path %}active{% endif %}"><i
+              class="fas fa-gauge-high"></i> Dashboard</a></li>
+        <li><a href="/addchickrequest/" class="{% if '/addchickrequest' in request.path %}active{% endif %}"><i
+              class="fas fa-plus"></i> Chick Request</a></li>
+        <li><a href="/addfeedrequest/" class="{% if '/addfeedrequest' in request.path %}active{% endif %}"><i
+              class="fas fa-plus"></i> Feed Request</a></li>
+        <li><a href="/registerfarmer/" class="{% if '/registerfarmer' in request.path %}active{% endif %}"><i
+              class="fas fa-user-plus"></i> Register Farmer</a></li>
+        <li><a href="/salesagentchickrequests/"
+            class="{% if '/salesagentchickrequests' in request.path %}active{% endif %}"><i class="fas fa-list"></i> My
+            Chick Requests</a></li>
+        <li><a href="/salesagentfeedrequests/"
+            class="{% if '/salesagentfeedrequests' in request.path %}active{% endif %}"><i class="fas fa-seedling"></i>
+            My Feed Requests</a></li>
+      </ul>
+      <div class="sidebar-footer">
+        <form action="/logout/" method="post">{% csrf_token %}<button class="btn btn-danger btn-logout"><i
+              class="fas fa-right-from-bracket"></i> Logout</button></form>
+      </div>
+    </aside>
+    <main class="main">
+      {% if messages %}
       <div class="messages">
         {% for message in messages %}
-          <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
         {% endfor %}
       </div>
-    {% endif %}
-    {% block content %}{% endblock %}
-    <footer class="site-footer"><p>&copy; 2025 Young4ChickS. Designed by Nafuna Anitah Soniah. All rights reserved.</p></footer>
-  </main>
-</div>
-<script>
-  const toggle=document.getElementById('menuToggle');
-  if(toggle){ toggle.addEventListener('click',()=>document.getElementById('sidebar').classList.toggle('open')); }
-</script>
-{% block extra_js %}{% endblock %}
+      {% endif %}
+      {% block content %}{% endblock %}
+      <footer class="site-footer">
+        <p>&copy; 2025 Young4ChickS. Designed by Nafuna Anitah Soniah. All rights reserved.</p>
+      </footer>
+    </main>
+  </div>
+  <script>
+    const toggle = document.getElementById('menuToggle');
+    if (toggle) { toggle.addEventListener('click', () => document.getElementById('sidebar').classList.toggle('open')); }
+  </script>
+  {% block extra_js %}{% endblock %}
 </body>
+
 </html>

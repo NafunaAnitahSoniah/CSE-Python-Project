@@ -17,9 +17,9 @@ from django.db import transaction
 # Create your views here.
 # Landing page
 def indexpage(request):
-    # Example data – latest 10 chick requests (safe even if none exist)
-    details = ChickRequest.objects.order_by('-id')[:10]
-    return render(request, 'index.html', {'details': details})
+    # Get latest 10 chick requests for the farmers table
+    chick_requests = ChickRequest.objects.select_related('farmer').order_by('-request_date')[:10]
+    return render(request, 'index.html', {'chick_requests': chick_requests})
 
 def signup(request):
     if request.method == 'POST':
@@ -1012,6 +1012,15 @@ def RegisterFarmer(request):
             import uuid
             username = f"farmer_{uuid.uuid4().hex[:8]}"
             
+            # Validate age based on date of birth
+            date_of_birth_str = request.POST.get('date_of_birth')
+            date_of_birth = datetime.strptime(date_of_birth_str, '%Y-%m-%d').date()
+            today = timezone.now().date()
+            age = today.year - date_of_birth.year - ((today.month, today.day) < (date_of_birth.month, date_of_birth.day))
+            
+            if age < 20 or age > 30:
+                raise ValueError('Farmer must be between 20 and 30 years old.')
+            
             # Create user profile with farmer role
             user = UserProfile.objects.create_user(
                 username=username,
@@ -1019,18 +1028,27 @@ def RegisterFarmer(request):
                 role='farmer'
             )
             
+            # Validate phone number and recommender tel length
+            phone_number = request.POST.get('phone_number')
+            recommender_tel = request.POST.get('recommender_tel')
+            
+            if len(phone_number) > 10:
+                raise ValueError('Phone Number cannot exceed 10 characters.')
+            if len(recommender_tel) > 10:
+                raise ValueError('Recommender Tel cannot exceed 10 characters.')
+            
             # Create customer record (farmer_id will be auto-generated)
             customer = Customer(
                 user=user,
                 farmer_name=request.POST.get('farmer_name'),
-                date_of_birth=request.POST.get('date_of_birth'),
+                date_of_birth=date_of_birth,
                 gender=request.POST.get('gender'),
                 location=request.POST.get('location'),
                 nin=request.POST.get('nin'),
-                phone_number=request.POST.get('phone_number'),
+                phone_number=phone_number,
                 recommender_name=request.POST.get('recommender_name'),
                 recommender_nin=request.POST.get('recommender_nin'),
-                recommender_tel=request.POST.get('recommender_tel'),
+                recommender_tel=recommender_tel,
                 registered_by=request.user.username
             )
             customer.full_clean()
@@ -1047,13 +1065,21 @@ def AddChickRequest(request):
         try:
             farmer_id = request.POST.get('farmer')
             farmer = get_object_or_404(Customer, id=farmer_id)
+            farmer_type = request.POST.get('farmer_type')
+            quantity = int(request.POST.get('quantity', 0))
+            
+            # Validation for farmer type and quantity
+            if farmer_type == 'starter' and quantity > 100:
+                raise ValueError('Starter farmers cannot request more than 100 chicks.')
+            if farmer_type == 'returning' and quantity > 500:
+                raise ValueError('Returning farmers cannot request more than 500 chicks.')
             
             chick_request = ChickRequest(
                 farmer=farmer,
-                farmer_type=request.POST.get('farmer_type'),
+                farmer_type=farmer_type,
                 chick_type=request.POST.get('chick_type'),
                 chick_breed=request.POST.get('chick_breed'),
-                quantity=request.POST.get('quantity'),
+                quantity=quantity,
                 chick_period=1,  # field kept in model; default to 1 day since input was removed
                 feed_taken=request.POST.get('feed_taken') == 'True',
                 feed_name=request.POST.get('feed_name') or None,

@@ -31,7 +31,8 @@
         </div>
         <div class="form-group">
             <label for="nin">NIN:</label>
-            <input class="form-control" type="text" name="nin" id="nin" maxlength="14" pattern="[A-Z0-9]{14}" required placeholder="14 alphanumeric characters">
+            <input class="form-control" type="text" name="nin" id="nin" maxlength="14" pattern="[A-Z0-9]{14}" required
+                placeholder="14 alphanumeric characters">
         </div>
         <div class="form-group">
             <label for="phone_number">Phone Number:</label>
@@ -39,7 +40,8 @@
         </div>
         <div class="form-group">
             <label for="recommender_name">Recommender Name:</label>
-            <input class="form-control" type="text" name="recommender_name" id="recommender_name" maxlength="50" required>
+            <input class="form-control" type="text" name="recommender_name" id="recommender_name" maxlength="50"
+                required>
         </div>
         <div class="form-group">
             <label for="recommender_nin">Recommender NIN:</label>
@@ -51,8 +53,71 @@
         </div>
         <div class="form-actions">
             <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Register Farmer</button>
-            <a href="/salesagentdashboard/" class="btn btn-outline"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+            <a href="/salesagentdashboard/" class="btn btn-outline"><i class="fas fa-arrow-left"></i> Back to
+                Dashboard</a>
         </div>
     </form>
 </section>
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const dobInput = document.getElementById('date_of_birth');
+        const form = document.querySelector('form');
+
+        function validateAge() {
+            const dob = new Date(dobInput.value);
+            const today = new Date();
+            const age = today.getFullYear() - dob.getFullYear() -
+                ((today.getMonth() < dob.getMonth() ||
+                    (today.getMonth() === dob.getMonth() && today.getDate() < dob.getDate())) ? 1 : 0);
+
+            if (age < 20 || age > 30) {
+                dobInput.setCustomValidity('Farmer must be between 20 and 30 years old.');
+                return false;
+            } else {
+                dobInput.setCustomValidity('');
+                return true;
+            }
+        }
+
+        dobInput.addEventListener('change', validateAge);
+
+        const phoneNumberInput = document.getElementById('phone_number');
+        const recommenderTelInput = document.getElementById('recommender_tel');
+
+        function validatePhoneNumber() {
+            if (phoneNumberInput.value.length > 10) {
+                phoneNumberInput.setCustomValidity('Phone Number cannot exceed 10 characters.');
+                return false;
+            } else {
+                phoneNumberInput.setCustomValidity('');
+                return true;
+            }
+        }
+
+        function validateRecommenderTel() {
+            if (recommenderTelInput.value.length > 10) {
+                recommenderTelInput.setCustomValidity('Recommender Tel cannot exceed 10 characters.');
+                return false;
+            } else {
+                recommenderTelInput.setCustomValidity('');
+                return true;
+            }
+        }
+
+        phoneNumberInput.addEventListener('input', validatePhoneNumber);
+        recommenderTelInput.addEventListener('input', validateRecommenderTel);
+
+        form.addEventListener('submit', function (e) {
+            if (!validateAge() || !validatePhoneNumber() || !validateRecommenderTel()) {
+                e.preventDefault();
+                dobInput.reportValidity();
+                phoneNumberInput.reportValidity();
+                recommenderTelInput.reportValidity();
+            }
+        });
+    });
+</script>
+{% endblock %}
 {% endblock %}

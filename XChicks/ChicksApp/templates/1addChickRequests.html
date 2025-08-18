@@ -31,7 +31,8 @@
             <select class="form-control" name="feed_name" id="feed_name">
                 <option value="">None</option>
                 {% for fa in approved_feeds %}
-                <option value="{{ fa.feed_name }}">{{ fa.feed_name }} ({{ fa.feed_type }} - {{ fa.feed_brand }})</option>
+                <option value="{{ fa.feed_name }}">{{ fa.feed_name }} ({{ fa.feed_type }} - {{ fa.feed_brand }})
+                </option>
                 {% endfor %}
             </select>
             <small class="form-help">Only feeds from your approved feed allocations are listed.</small>
@@ -55,7 +56,7 @@
             <label for="quantity">Quantity:</label>
             <input class="form-control" type="number" name="quantity" id="quantity" min="1" required>
         </div>
-    {# Chick Period removed as per requirements #}
+        {# Chick Period removed as per requirements #}
         <div class="form-group">
             <label for="feed_taken">Feed Taken:</label>
             <select class="form-control" name="feed_taken" id="feed_taken" required>
@@ -83,45 +84,77 @@
         <div class="form-actions">
             <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Submit Request</button>
             <a href="/addfeedrequest/" class="btn btn-secondary"><i class="fas fa-plus"></i> Add Feed Request</a>
-            <a href="/salesagentdashboard/" class="btn btn-outline"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+            <a href="/salesagentdashboard/" class="btn btn-outline"><i class="fas fa-arrow-left"></i> Back to
+                Dashboard</a>
         </div>
     </form>
 </section>
 {% block extra_js %}
 {{ stock_counts|json_script:"stockCounts" }}
 <script>
-document.addEventListener('DOMContentLoaded', function(){
-    const typeSel = document.getElementById('chick_type');
-    const breedSel = document.getElementById('chick_breed');
-    const hint = document.getElementById('breedHint');
-    // stock map from context
-    const stock = JSON.parse(document.getElementById('stockCounts').textContent);
-    function refreshBreeds(){
-        const t = (typeSel.value||'').toLowerCase();
-        breedSel.innerHTML = '<option value="">Select Breed</option>';
-        if(!t || !stock[t]){ hint.textContent=''; return; }
-        const localCount = stock[t].local||0;
-        const exoticCount = stock[t].exotic||0;
-        if(localCount>0){
-            const opt = document.createElement('option');
-            opt.value='local';
-            opt.textContent=`Local — available: ${localCount}`;
-            breedSel.appendChild(opt);
+    document.addEventListener('DOMContentLoaded', function () {
+        const typeSel = document.getElementById('chick_type');
+        const breedSel = document.getElementById('chick_breed');
+        const hint = document.getElementById('breedHint');
+        // stock map from context
+        const stock = JSON.parse(document.getElementById('stockCounts').textContent);
+        function refreshBreeds() {
+            const t = (typeSel.value || '').toLowerCase();
+            breedSel.innerHTML = '<option value="">Select Breed</option>';
+            if (!t || !stock[t]) { hint.textContent = ''; return; }
+            const localCount = stock[t].local || 0;
+            const exoticCount = stock[t].exotic || 0;
+            if (localCount > 0) {
+                const opt = document.createElement('option');
+                opt.value = 'local';
+                opt.textContent = `Local — available: ${localCount}`;
+                breedSel.appendChild(opt);
+            }
+            if (exoticCount > 0) {
+                const opt = document.createElement('option');
+                opt.value = 'exotic';
+                opt.textContent = `Exotic — available: ${exoticCount}`;
+                breedSel.appendChild(opt);
+            }
+            if (localCount === 0 && exoticCount === 0) {
+                hint.textContent = 'No stock available for the selected type.';
+            } else {
+                hint.textContent = '';
+            }
         }
-        if(exoticCount>0){
-            const opt = document.createElement('option');
-            opt.value='exotic';
-            opt.textContent=`Exotic — available: ${exoticCount}`;
-            breedSel.appendChild(opt);
+        typeSel && typeSel.addEventListener('change', refreshBreeds);
+
+        // Add validation for quantity based on farmer type
+        const farmerTypeSel = document.getElementById('farmer_type');
+        const quantityInput = document.getElementById('quantity');
+        const form = document.querySelector('form');
+
+        function validateQuantity() {
+            const farmerType = farmerTypeSel.value;
+            const quantity = parseInt(quantityInput.value) || 0;
+
+            if (farmerType === 'starter' && quantity > 100) {
+                quantityInput.setCustomValidity('Starter farmers cannot request more than 100 chicks.');
+                return false;
+            } else if (farmerType === 'returning' && quantity > 500) {
+                quantityInput.setCustomValidity('Returning farmers cannot request more than 500 chicks.');
+                return false;
+            } else {
+                quantityInput.setCustomValidity('');
+                return true;
+            }
         }
-        if(localCount===0 && exoticCount===0){
-            hint.textContent = 'No stock available for the selected type.';
-        } else {
-            hint.textContent = '';
-        }
-    }
-    typeSel && typeSel.addEventListener('change', refreshBreeds);
-});
+
+        farmerTypeSel.addEventListener('change', validateQuantity);
+        quantityInput.addEventListener('input', validateQuantity);
+
+        form.addEventListener('submit', function (e) {
+            if (!validateQuantity()) {
+                e.preventDefault();
+                quantityInput.reportValidity();
+            }
+        });
+    });
 </script>
 {% endblock %}
 {% endblock %}
