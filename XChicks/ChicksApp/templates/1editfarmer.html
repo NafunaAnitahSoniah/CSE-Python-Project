@@ -1,0 +1,77 @@
+# filepath: c:\CIVIL ENGINEERING\Refractory Academy\CSE-Python-project\CSE-Python-Project\XChicks\ChicksApp\templates\1editfarmer.html
+
+{% extends 'base_agent.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h3>Edit Farmer Details</h3>
+        </div>
+        <div class="card-body">
+            <form method="POST" class="needs-validation" novalidate>
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="name">Full Name</label>
+                        <input type="text" class="form-control" id="name" name="name" 
+                               value="{{ farmer.name }}" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="phone">Phone Number</label>
+                        <input type="text" class="form-control" id="phone" name="phone" 
+                               value="{{ farmer.phone }}" required>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="location">Location</label>
+                        <input type="text" class="form-control" id="location" name="location" 
+                               value="{{ farmer.location }}" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="age">Age</label>
+                        <input type="number" class="form-control" id="age" name="age" 
+                               value="{{ farmer.age }}" required>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="gender">Gender</label>
+                        <select class="form-control" id="gender" name="gender" required>
+                            <option value="M" {% if farmer.gender == 'M' %}selected{% endif %}>Male</option>
+                            <option value="F" {% if farmer.gender == 'F' %}selected{% endif %}>Female</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="next_of_kin">Next of Kin</label>
+                        <input type="text" class="form-control" id="next_of_kin" name="next_of_kin" 
+                               value="{{ farmer.next_of_kin }}" required>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="next_of_kin_phone">Next of Kin Phone</label>
+                        <input type="text" class="form-control" id="next_of_kin_phone" 
+                               name="next_of_kin_phone" value="{{ farmer.next_of_kin_phone }}" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="recommender">Recommender</label>
+                        <input type="text" class="form-control" id="recommender" name="recommender" 
+                               value="{{ farmer.recommender }}">
+                    </div>
+                </div>
+
+                <div class="text-center mt-4">
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                    <a href="{% url 'viewfarmers' %}" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

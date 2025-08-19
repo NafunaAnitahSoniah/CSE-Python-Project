@@ -64,4 +64,7 @@ urlpatterns = [
     path('registerfarmer/', views.RegisterFarmer, name='registerfarmer'),
     path('salesagentchickrequests/', views.ViewSalesAgentChickRequests, name='salesagentchickrequests'),
     path('salesagentfeedrequests/', views.ViewSalesAgentFeedRequests, name='salesagentfeedrequests'),
+    path('viewfarmers/', views.ViewFarmers, name='viewfarmers'),
+    path('edit-farmer/<int:farmer_id>/', views.EditFarmer, name='edit_farmer'),
+    path('delete-farmer/<int:farmer_id>/', views.DeleteFarmer, name='delete_farmer'),
 ]
