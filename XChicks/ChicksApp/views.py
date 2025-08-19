@@ -1449,38 +1449,60 @@ def MarkFeedDelivered(request, alloc_id:int):
 
 @role_required('sales_agent')
 def EditFarmer(request, farmer_id):
-    farmer = get_object_or_404(Customer, id=farmer_id, registered_by=request.user)
-    
+    from django.db.models import Q
+    farmer_instance = get_object_or_404(Customer, 
+        Q(id=farmer_id) & (Q(sales_agent=request.user) | Q(registered_by=request.user.username)))
+
     if request.method == 'POST':
-        # Get data from POST request
-        farmer.name = request.POST.get('name')
-        farmer.phone = request.POST.get('phone')
-        farmer.location = request.POST.get('location')
-        farmer.age = request.POST.get('age')
-        farmer.gender = request.POST.get('gender')
-        farmer.next_of_kin = request.POST.get('next_of_kin')
-        farmer.next_of_kin_phone = request.POST.get('next_of_kin_phone')
-        farmer.recommender = request.POST.get('recommender')
-        
         try:
-            farmer.save()
-            messages.success(request, 'Farmer details updated successfully!')
-            return redirect('view_registered_farmers')
-        except Exception as e:
-            messages.error(request, f'Error updating farmer: {str(e)}')
+            # Update farmer_instance fields from POST data
+            farmer_instance.farmer_name = request.POST.get('farmer_name')
+            farmer_instance.location = request.POST.get('location')
+            farmer_instance.phone_number = request.POST.get('phone_number')
+            farmer_instance.recommender_name = request.POST.get('recommender_name')
+            farmer_instance.recommender_nin = request.POST.get('recommender_nin')
+            farmer_instance.recommender_tel = request.POST.get('recommender_tel')
+            farmer_instance.gender = request.POST.get('gender')
+
+            # Validate phone number and recommender tel length (exactly 10 characters)
+            if len(farmer_instance.phone_number) != 10:
+                raise ValueError('Phone Number must be exactly 10 characters.')
+            if len(farmer_instance.recommender_tel) != 10:
+                raise ValueError('Recommender Tel must be exactly 10 characters.')
             
-    return render(request, '1editfarmer.html', {'farmer': farmer})
+            # Validate recommender NIN (exactly 14 characters)
+            if len(farmer_instance.recommender_nin) != 14:
+                raise ValueError('Recommender NIN must be exactly 14 characters.')
+
+            farmer_instance.full_clean()
+            farmer_instance.save()
+            messages.success(request, 'Farmer details updated successfully!')
+            return redirect('salesagentfarmers')
+        except Exception as e:
+            messages.error(request, str(e))
+    
+    # Calculate gender selection flags to avoid template syntax issues
+    is_male = farmer_instance.gender == 'M'
+    is_female = farmer_instance.gender == 'F'
+    
+    return render(request, '1editfarmer.html', {
+        'farmer': farmer_instance,
+        'is_male': is_male,
+        'is_female': is_female
+    })
 
 @role_required('sales_agent')
 def DeleteFarmer(request, farmer_id):
-    farmer = get_object_or_404(Customer, id=farmer_id, registered_by=request.user)
+    from django.db.models import Q
+    farmer = get_object_or_404(Customer, 
+        Q(id=farmer_id) & (Q(sales_agent=request.user) | Q(registered_by=request.user.username)))
     if request.method == 'POST':
         try:
             farmer.delete()
             messages.success(request, 'Farmer deleted successfully!')
         except Exception as e:
             messages.error(request, f'Error deleting farmer: {str(e)}')
-        return redirect('view_registered_farmers')
-    return render(request, 'deletefarmer.html', {'farmer': farmer})
+        return redirect('salesagentfarmers')
+    return render(request, 'deleteFarmer.html', {'farmer': farmer})
 
 

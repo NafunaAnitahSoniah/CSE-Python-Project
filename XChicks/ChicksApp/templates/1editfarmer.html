@@ -1,77 +1,87 @@
-# filepath: c:\CIVIL ENGINEERING\Refractory Academy\CSE-Python-project\CSE-Python-Project\XChicks\ChicksApp\templates\1editfarmer.html
-
 {% extends 'base_agent.html' %}
 {% load static %}
 
+{% block title %}Edit Farmer | Young4ChickS{% endblock %}
+
 {% block content %}
-<div class="container mt-4">
-    <div class="card">
-        <div class="card-header">
-            <h3>Edit Farmer Details</h3>
+<header class="page-header">
+    <h1><i class="fas fa-edit"></i> Edit Farmer Details</h1>
+    <div class="subtitle">Update farmer information</div>
+</header>
+
+<section class="card fade-in">
+    <h4><i class="fas fa-user-edit"></i> Edit Farmer Form</h4>
+    <form method="post" class="form-grid">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="farmer_name"><i class="fas fa-user"></i> Farmer Name:</label>
+            <input type="text" class="form-control" id="farmer_name" name="farmer_name" value="{{ farmer.farmer_name }}"
+                required>
         </div>
-        <div class="card-body">
-            <form method="POST" class="needs-validation" novalidate>
-                {% csrf_token %}
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label for="name">Full Name</label>
-                        <input type="text" class="form-control" id="name" name="name" 
-                               value="{{ farmer.name }}" required>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="phone">Phone Number</label>
-                        <input type="text" class="form-control" id="phone" name="phone" 
-                               value="{{ farmer.phone }}" required>
-                    </div>
-                </div>
 
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label for="location">Location</label>
-                        <input type="text" class="form-control" id="location" name="location" 
-                               value="{{ farmer.location }}" required>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="age">Age</label>
-                        <input type="number" class="form-control" id="age" name="age" 
-                               value="{{ farmer.age }}" required>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label for="gender">Gender</label>
-                        <select class="form-control" id="gender" name="gender" required>
-                            <option value="M" {% if farmer.gender == 'M' %}selected{% endif %}>Male</option>
-                            <option value="F" {% if farmer.gender == 'F' %}selected{% endif %}>Female</option>
-                        </select>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="next_of_kin">Next of Kin</label>
-                        <input type="text" class="form-control" id="next_of_kin" name="next_of_kin" 
-                               value="{{ farmer.next_of_kin }}" required>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label for="next_of_kin_phone">Next of Kin Phone</label>
-                        <input type="text" class="form-control" id="next_of_kin_phone" 
-                               name="next_of_kin_phone" value="{{ farmer.next_of_kin_phone }}" required>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="recommender">Recommender</label>
-                        <input type="text" class="form-control" id="recommender" name="recommender" 
-                               value="{{ farmer.recommender }}">
-                    </div>
-                </div>
-
-                <div class="text-center mt-4">
-                    <button type="submit" class="btn btn-primary">Save Changes</button>
-                    <a href="{% url 'viewfarmers' %}" class="btn btn-secondary">Cancel</a>
-                </div>
-            </form>
+        <div class="form-group">
+            <label for="date_of_birth"><i class="fas fa-calendar"></i> Date of Birth:</label>
+            <input type="date" class="form-control" id="date_of_birth" name="date_of_birth"
+                value="{{ farmer.date_of_birth|date:'Y-m-d' }}" readonly
+                style="background-color: #f8f9fa; cursor: not-allowed;">
         </div>
-    </div>
-</div>
+
+        <div class="form-group">
+            <label for="gender"><i class="fas fa-venus-mars"></i> Gender:</label>
+            <select class="form-control" id="gender" name="gender">
+                <option value="M" {% if is_male %}selected{% endif %}>Male</option>
+                <option value="F" {% if is_female %}selected{% endif %}>Female</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="location"><i class="fas fa-map-marker-alt"></i> Location:</label>
+            <input type="text" class="form-control" id="location" name="location" value="{{ farmer.location }}"
+                required>
+        </div>
+
+        <div class="form-group">
+            <label for="nin"><i class="fas fa-id-card"></i> NIN:</label>
+            <input type="text" class="form-control" id="nin" name="nin" value="{{ farmer.nin }}" readonly
+                style="background-color: #f8f9fa; cursor: not-allowed;">
+        </div>
+
+        <div class="form-group">
+            <label for="phone_number"><i class="fas fa-phone"></i> Phone Number:</label>
+            <input type="text" class="form-control" id="phone_number" name="phone_number"
+                value="{{ farmer.phone_number }}" maxlength="10" pattern="[0-9]{10}"
+                title="Phone number must be exactly 10 digits" placeholder="e.g., 0777123456" required>
+        </div>
+
+        <div class="form-group">
+            <label for="recommender_name"><i class="fas fa-user-tie"></i> Recommender Name:</label>
+            <input type="text" class="form-control" id="recommender_name" name="recommender_name"
+                value="{{ farmer.recommender_name }}" maxlength="50" placeholder="Full name of recommender" required>
+        </div>
+
+        <div class="form-group">
+            <label for="recommender_nin"><i class="fas fa-id-badge"></i> Recommender NIN:</label>
+            <input type="text" class="form-control" id="recommender_nin" name="recommender_nin"
+                value="{{ farmer.recommender_nin }}" maxlength="14" pattern="[A-Z0-9]{14}"
+                title="NIN must be exactly 14 alphanumeric characters" placeholder="14 alphanumeric characters"
+                required>
+        </div>
+
+        <div class="form-group">
+            <label for="recommender_tel"><i class="fas fa-phone-alt"></i> Recommender Phone:</label>
+            <input type="text" class="form-control" id="recommender_tel" name="recommender_tel"
+                value="{{ farmer.recommender_tel }}" maxlength="10" pattern="[0-9]{10}"
+                title="Recommender phone must be exactly 10 digits" placeholder="e.g., 0777123456" required>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i> Update Farmer
+            </button>
+            <a href="{% url 'salesagentfarmers' %}" class="btn btn-outline">
+                <i class="fas fa-times"></i> Cancel
+            </a>
+        </div>
+    </form>
+</section>
 {% endblock %}
