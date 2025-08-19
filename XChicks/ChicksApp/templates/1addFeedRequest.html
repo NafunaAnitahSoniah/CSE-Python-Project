@@ -35,7 +35,7 @@
         </div>
         <div class="form-group">
             <label for="amount_due">Amount Due (UgSh):</label>
-            <input class="form-control" type="number" name="amount_due" id="amount_due" min="0" required>
+            <input class="form-control" type="number" name="amount_due" id="amount_due" min="0" required readonly>
         </div>
         <div class="form-group">
             <label for="payment_due_date">Payment Due Date:</label>
@@ -55,4 +55,22 @@
         </div>
     </form>
 </section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const feedStockSelect = document.getElementById('feed_stock');
+    const bagsInput = document.getElementById('bags_allocated');
+    const amountDueInput = document.getElementById('amount_due');
+
+    function calculateAmountDue() {
+        const selectedOption = feedStockSelect.options[feedStockSelect.selectedIndex];
+        const unitPrice = parseFloat(selectedOption.getAttribute('data-price')) || 0;
+        const bags = parseInt(bagsInput.value) || 0;
+        amountDueInput.value = unitPrice * bags;
+    }
+
+    feedStockSelect.addEventListener('change', calculateAmountDue);
+    bagsInput.addEventListener('input', calculateAmountDue);
+});
+</script>
 {% endblock %}
