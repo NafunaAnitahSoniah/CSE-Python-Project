@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from .models import UserProfile
+from .models import UserProfile, Customer
 
 
 class UserCreation(UserCreationForm):
@@ -15,9 +15,6 @@ class UserCreation(UserCreationForm):
         if commit:
             user.save()
         return user
-    
-
-
 
 
 

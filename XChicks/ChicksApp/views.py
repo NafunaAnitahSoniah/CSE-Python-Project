@@ -6,13 +6,11 @@ from django.http import HttpResponse, HttpResponseBadRequest
 from datetime import datetime
 from django.utils import timezone
 from django.core.exceptions import PermissionDenied
-from .models import *
-from .forms import *
+from .models import UserProfile, ChickRequest, FeedAllocation, ChickStock, FeedStock, Customer
 from django.contrib.auth import authenticate, login, logout
 from django.db import transaction
 from django.contrib.auth.forms import AuthenticationForm
-from django.db import transaction
-
+from .forms import UserCreation
 
 # Create your views here.
 # Landing page
@@ -1180,6 +1178,11 @@ def RegisterFarmer(request):
     return render(request, '1registerfarmer.html')
 
 @role_required('sales_agent')
+def ViewFarmers(request):
+    # Get all farmers registered by this agent
+    return render(request, '1viewfarmers.html')    
+
+@role_required('sales_agent')
 def AddChickRequest(request):
     if request.method == 'POST':
         try:
@@ -1442,5 +1445,42 @@ def MarkFeedDelivered(request, alloc_id:int):
         alloc.save(update_fields=['delivered'])
         messages.success(request, f"Marked {alloc.feed_request_id} as delivered.")
     return redirect('Deliveries')
+
+
+@role_required('sales_agent')
+def EditFarmer(request, farmer_id):
+    farmer = get_object_or_404(Customer, id=farmer_id, registered_by=request.user)
+    
+    if request.method == 'POST':
+        # Get data from POST request
+        farmer.name = request.POST.get('name')
+        farmer.phone = request.POST.get('phone')
+        farmer.location = request.POST.get('location')
+        farmer.age = request.POST.get('age')
+        farmer.gender = request.POST.get('gender')
+        farmer.next_of_kin = request.POST.get('next_of_kin')
+        farmer.next_of_kin_phone = request.POST.get('next_of_kin_phone')
+        farmer.recommender = request.POST.get('recommender')
+        
+        try:
+            farmer.save()
+            messages.success(request, 'Farmer details updated successfully!')
+            return redirect('view_registered_farmers')
+        except Exception as e:
+            messages.error(request, f'Error updating farmer: {str(e)}')
+            
+    return render(request, '1editfarmer.html', {'farmer': farmer})
+
+@role_required('sales_agent')
+def DeleteFarmer(request, farmer_id):
+    farmer = get_object_or_404(Customer, id=farmer_id, registered_by=request.user)
+    if request.method == 'POST':
+        try:
+            farmer.delete()
+            messages.success(request, 'Farmer deleted successfully!')
+        except Exception as e:
+            messages.error(request, f'Error deleting farmer: {str(e)}')
+        return redirect('view_registered_farmers')
+    return render(request, 'deletefarmer.html', {'farmer': farmer})
 
 
