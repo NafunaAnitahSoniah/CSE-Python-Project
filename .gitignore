@@ -61,3 +61,4 @@ Thumbs.db
 .env.development.local
 .env.test.local
 .env.production.local
+XChicks/db.sqlite3.backup
