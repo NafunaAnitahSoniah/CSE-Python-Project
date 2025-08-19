@@ -15,7 +15,8 @@
 
 <body>
   <div class="mobile-bar"> <button id="menuToggle" aria-label="Toggle navigation"><i class="fas fa-bars"></i></button>
-    <strong>Young4ChickS</strong></div>
+    <strong>Young4ChickS</strong>
+  </div>
   <div class="layout-wrapper">
     <aside class="sidebar" id="sidebar">
       <div class="brand"><img src="{% static 'images/logo.jpg' %}" alt="Logo"><strong>Young4ChickS</strong></div>
@@ -35,6 +36,8 @@
         <li><a href="/salesagentfeedrequests/"
             class="{% if '/salesagentfeedrequests' in request.path %}active{% endif %}"><i class="fas fa-seedling"></i>
             My Feed Requests</a></li>
+        <li><a href="/salesagentfarmers/" class="{% if '/salesagentfarmers' in request.path %}active{% endif %}"><i
+              class="fas fa-users"></i> My Farmers</a></li>
       </ul>
       <div class="sidebar-footer">
         <form action="/logout/" method="post">{% csrf_token %}<button class="btn btn-danger btn-logout"><i

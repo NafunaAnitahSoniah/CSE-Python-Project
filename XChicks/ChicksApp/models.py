@@ -70,7 +70,7 @@ class FeedStock(models.Model):
 
 class Customer(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    farmer_id = models.CharField(max_length=15, unique=True, blank=True)
+    farmer_id = models.CharField(max_length=16, unique=True, blank=True)
     farmer_name = models.CharField(max_length=50)
     date_of_birth = models.DateField()
     # Age is now auto-calculated from date_of_birth; validators removed to allow any resulting age
@@ -87,6 +87,7 @@ class Customer(models.Model):
     recommender_nin = models.CharField(max_length=14)
     recommender_tel = models.CharField(max_length=15)
     registered_by = models.CharField(max_length=50)
+    sales_agent = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='registered_farmers')
     registration_date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

@@ -17,9 +17,39 @@ from django.db import transaction
 # Create your views here.
 # Landing page
 def indexpage(request):
-    # Get latest 10 chick requests for the farmers table
-    chick_requests = ChickRequest.objects.select_related('farmer').order_by('-request_date')[:10]
-    return render(request, 'index.html', {'chick_requests': chick_requests})
+    # Get search query and items per page from request
+    search_query = request.GET.get('q', '')
+    items_per_page = int(request.GET.get('per_page', 10))
+
+    # Get all chick requests, ordered by request date
+    chick_requests_qs = ChickRequest.objects.select_related('farmer').order_by('-request_date')
+
+    # Apply search filter
+    if search_query:
+        chick_requests_qs = chick_requests_qs.filter(
+            Q(farmer__farmer_name__icontains=search_query) | 
+            Q(chick_request_id__icontains=search_query)
+        )
+
+    # Paginate the results
+    from django.core.paginator import Paginator
+    paginator = Paginator(chick_requests_qs, items_per_page)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    # Create selection flags for the dropdown
+    is_10_selected = items_per_page == 10
+    is_20_selected = items_per_page == 20
+    is_100_selected = items_per_page == 100
+
+    return render(request, 'index.html', {
+        'page_obj': page_obj,
+        'search_query': search_query,
+        'items_per_page': items_per_page,
+        'is_10_selected': is_10_selected,
+        'is_20_selected': is_20_selected,
+        'is_100_selected': is_100_selected,
+    })
 
 def signup(request):
     if request.method == 'POST':
@@ -1004,6 +1034,90 @@ def SalesAgentdashboard(request):
     }
     return render(request, '1salesAgentdashboard.html', context)
 
+
+@role_required('sales_agent')
+def ViewSalesAgentFarmers(request):
+    from django.db.models import Q
+    # Include both new linkage via sales_agent and legacy via registered_by username
+    base_qs = Customer.objects.filter(
+        Q(sales_agent=request.user) | Q(registered_by=request.user.username)
+    ).select_related('sales_agent').order_by('-registration_date')
+
+    search_query = request.GET.get('q', '').strip()
+    if search_query:
+        base_qs = base_qs.filter(
+            Q(farmer_name__icontains=search_query) |
+            Q(phone_number__icontains=search_query) |
+            Q(farmer_id__icontains=search_query)
+        )
+
+    return render(request, '1viewfarmers.html', {'farmers': base_qs})
+
+@role_required('sales_agent')
+def EditFarmer(request, farmer_id):
+    from django.db.models import Q
+    farmer_instance = get_object_or_404(Customer, 
+        Q(id=farmer_id) & (Q(sales_agent=request.user) | Q(registered_by=request.user.username)))
+
+    if request.method == 'POST':
+        try:
+            # Update farmer_instance fields from POST data
+            farmer_instance.farmer_name = request.POST.get('farmer_name')
+            farmer_instance.date_of_birth = datetime.strptime(request.POST.get('date_of_birth'), '%Y-%m-%d').date()
+            farmer_instance.gender = request.POST.get('gender')
+            farmer_instance.location = request.POST.get('location')
+            farmer_instance.nin = request.POST.get('nin')
+            farmer_instance.phone_number = request.POST.get('phone_number')
+            farmer_instance.recommender_name = request.POST.get('recommender_name')
+            farmer_instance.recommender_nin = request.POST.get('recommender_nin')
+            farmer_instance.recommender_tel = request.POST.get('recommender_tel')
+
+            # Validate age based on date of birth
+            today = timezone.now().date()
+            age = today.year - farmer_instance.date_of_birth.year - ((today.month, today.day) < (farmer_instance.date_of_birth.month, farmer_instance.date_of_birth.day))
+            if age < 20 or age > 30:
+                raise ValueError('Farmer must be between 20 and 30 years old.')
+
+            # Validate phone number and recommender tel length (exactly 10 characters)
+            if len(farmer_instance.phone_number) != 10:
+                raise ValueError('Phone Number must be exactly 10 characters.')
+            if len(farmer_instance.recommender_tel) != 10:
+                raise ValueError('Recommender Tel must be exactly 10 characters.')
+            
+            # Validate recommender NIN (exactly 14 characters)
+            if len(farmer_instance.recommender_nin) != 14:
+                raise ValueError('Recommender NIN must be exactly 14 characters.')
+
+            farmer_instance.full_clean()
+            farmer_instance.save()
+            messages.success(request, 'Farmer details updated successfully!')
+            return redirect('salesagentfarmers')
+        except Exception as e:
+            messages.error(request, str(e))
+    # Calculate gender selection flags to avoid template syntax issues
+    is_male = farmer_instance.gender == 'M'
+    is_female = farmer_instance.gender == 'F'
+    
+    return render(request, 'editFarmer.html', {
+        'farmer': farmer_instance,
+        'is_male': is_male,
+        'is_female': is_female
+    })
+
+@role_required('sales_agent')
+def DeleteFarmer(request, farmer_id):
+    from django.db.models import Q
+    farmer = get_object_or_404(Customer, 
+        Q(id=farmer_id) & (Q(sales_agent=request.user) | Q(registered_by=request.user.username)))
+    if request.method == 'POST':
+        try:
+            farmer.delete()
+            messages.success(request, 'Farmer deleted successfully.')
+            return redirect('salesagentfarmers')
+        except Exception as e:
+            messages.error(request, str(e))
+    return render(request, 'deleteFarmer.html', {'farmer': farmer})
+
 @role_required('sales_agent')
 def RegisterFarmer(request):
     if request.method == 'POST':
@@ -1028,14 +1142,19 @@ def RegisterFarmer(request):
                 role='farmer'
             )
             
-            # Validate phone number and recommender tel length
+            # Validate phone number and recommender tel length (exactly 10 characters)
             phone_number = request.POST.get('phone_number')
             recommender_tel = request.POST.get('recommender_tel')
+            recommender_nin = request.POST.get('recommender_nin')
             
-            if len(phone_number) > 10:
-                raise ValueError('Phone Number cannot exceed 10 characters.')
-            if len(recommender_tel) > 10:
-                raise ValueError('Recommender Tel cannot exceed 10 characters.')
+            if len(phone_number) != 10:
+                raise ValueError('Phone Number must be exactly 10 characters.')
+            if len(recommender_tel) != 10:
+                raise ValueError('Recommender Tel must be exactly 10 characters.')
+            
+            # Validate recommender NIN (exactly 14 characters)
+            if len(recommender_nin) != 14:
+                raise ValueError('Recommender NIN must be exactly 14 characters.')
             
             # Create customer record (farmer_id will be auto-generated)
             customer = Customer(
@@ -1049,7 +1168,8 @@ def RegisterFarmer(request):
                 recommender_name=request.POST.get('recommender_name'),
                 recommender_nin=request.POST.get('recommender_nin'),
                 recommender_tel=recommender_tel,
-                registered_by=request.user.username
+                registered_by=request.user.username,
+                sales_agent=request.user # Assign the current sales agent
             )
             customer.full_clean()
             customer.save()

@@ -36,7 +36,8 @@
         </div>
         <div class="form-group">
             <label for="phone_number">Phone Number:</label>
-            <input class="form-control" type="text" name="phone_number" id="phone_number" maxlength="15" required>
+            <input class="form-control" type="text" name="phone_number" id="phone_number" maxlength="10"
+                pattern="[0-9]{10}" title="Phone number must be exactly 10 digits" required>
         </div>
         <div class="form-group">
             <label for="recommender_name">Recommender Name:</label>
@@ -45,11 +46,13 @@
         </div>
         <div class="form-group">
             <label for="recommender_nin">Recommender NIN:</label>
-            <input class="form-control" type="text" name="recommender_nin" id="recommender_nin" maxlength="14" required>
+            <input class="form-control" type="text" name="recommender_nin" id="recommender_nin" maxlength="14"
+                pattern="[A-Z0-9]{14}" title="Recommender NIN must be exactly 14 alphanumeric characters" required>
         </div>
         <div class="form-group">
             <label for="recommender_tel">Recommender Tel:</label>
-            <input class="form-control" type="text" name="recommender_tel" id="recommender_tel" maxlength="15" required>
+            <input class="form-control" type="text" name="recommender_tel" id="recommender_tel" maxlength="10"
+                pattern="[0-9]{10}" title="Recommender phone must be exactly 10 digits" required>
         </div>
         <div class="form-actions">
             <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Register Farmer</button>
@@ -85,10 +88,11 @@
 
         const phoneNumberInput = document.getElementById('phone_number');
         const recommenderTelInput = document.getElementById('recommender_tel');
+        const recommenderNinInput = document.getElementById('recommender_nin');
 
         function validatePhoneNumber() {
-            if (phoneNumberInput.value.length > 10) {
-                phoneNumberInput.setCustomValidity('Phone Number cannot exceed 10 characters.');
+            if (phoneNumberInput.value.length !== 10) {
+                phoneNumberInput.setCustomValidity('Phone Number must be exactly 10 digits.');
                 return false;
             } else {
                 phoneNumberInput.setCustomValidity('');
@@ -97,8 +101,8 @@
         }
 
         function validateRecommenderTel() {
-            if (recommenderTelInput.value.length > 10) {
-                recommenderTelInput.setCustomValidity('Recommender Tel cannot exceed 10 characters.');
+            if (recommenderTelInput.value.length !== 10) {
+                recommenderTelInput.setCustomValidity('Recommender Tel must be exactly 10 digits.');
                 return false;
             } else {
                 recommenderTelInput.setCustomValidity('');
@@ -106,15 +110,27 @@
             }
         }
 
+        function validateRecommenderNin() {
+            if (recommenderNinInput.value.length !== 14) {
+                recommenderNinInput.setCustomValidity('Recommender NIN must be exactly 14 characters.');
+                return false;
+            } else {
+                recommenderNinInput.setCustomValidity('');
+                return true;
+            }
+        }
+
         phoneNumberInput.addEventListener('input', validatePhoneNumber);
         recommenderTelInput.addEventListener('input', validateRecommenderTel);
+        recommenderNinInput.addEventListener('input', validateRecommenderNin);
 
         form.addEventListener('submit', function (e) {
-            if (!validateAge() || !validatePhoneNumber() || !validateRecommenderTel()) {
+            if (!validateAge() || !validatePhoneNumber() || !validateRecommenderTel() || !validateRecommenderNin()) {
                 e.preventDefault();
                 dobInput.reportValidity();
                 phoneNumberInput.reportValidity();
                 recommenderTelInput.reportValidity();
+                recommenderNinInput.reportValidity();
             }
         });
     });

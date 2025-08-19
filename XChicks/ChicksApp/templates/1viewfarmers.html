@@ -1,0 +1,163 @@
+{% extends 'base_agent.html' %}
+{% block title %}My Farmers | Young4ChickS{% endblock %}
+{% block content %}
+<header class="page-header">
+    <h1>My Farmers</h1>
+    <div class="subtitle">Farmers registered by you</div>
+    <div class="actions" style="margin-top:8px">
+        <a href="/registerfarmer/" class="btn btn-primary btn-sm"><i class="fas fa-user-plus"></i> Register Farmer</a>
+    </div>
+
+    <form method="get" class="form-inline" style="margin-top:12px">
+        <input class="form-control" type="text" name="q" placeholder="Search by name, phone or ID"
+            value="{{ request.GET.q }}">
+        <button class="btn btn-outline" type="submit"><i class="fas fa-search"></i> Search</button>
+    </form>
+
+
+</header>
+
+<section class="card fade-in">
+    <h4><i class="fas fa-users"></i> Farmers</h4>
+    <div class="table-responsive">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Farmer ID</th>
+                    <th>Name</th>
+                    <th>Phone</th>
+                    <th>Location</th>
+                    <th>Registered On</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for farmer in farmers %}
+                <tr>
+                    <td data-label="Farmer ID">{{ farmer.farmer_id }}</td>
+                    <td data-label="Name">{{ farmer.farmer_name }}</td>
+                    <td data-label="Phone">{{ farmer.phone_number }}</td>
+                    <td data-label="Location">{{ farmer.location }}</td>
+                    <td data-label="Registered On">{{ farmer.registration_date|date:'Y-m-d H:i' }}</td>
+                    <td data-label="Actions">
+                        <a href="{% url 'edit_farmer' farmer.id %}" class="btn btn-info btn-sm"><i
+                                class="fas fa-pen"></i> Edit</a>
+                        <button onclick="confirmDelete('{{ farmer.farmer_name }}', {{ farmer.id }})" class="btn btn-danger btn-sm"><i
+                                class="fas fa-trash"></i> Delete</button>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center">No farmers found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="card-footer">
+        <a href="/registerfarmer/" class="btn btn-primary"><i class="fas fa-user-plus"></i> Register Farmer</a>
+        <a href="/salesagentdashboard/" class="btn btn-outline"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+    </div>
+</section>
+
+<!-- Hidden form for delete confirmation -->
+<form id="deleteForm" method="post" style="display: none;">
+    {% csrf_token %}
+</form>
+
+<!-- Delete Confirmation Modal -->
+<div id="deleteModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3><i class="fas fa-exclamation-triangle"></i> Confirm Delete</h3>
+        </div>
+        <div class="modal-body">
+            <p>Are you sure you want to delete farmer <strong id="farmerName"></strong>?</p>
+            <p class="text-muted">This action cannot be undone.</p>
+        </div>
+        <div class="modal-footer">
+            <button onclick="closeDeleteModal()" class="btn btn-outline">Cancel</button>
+            <button onclick="deleteFarmer()" class="btn btn-danger">Delete Farmer</button>
+        </div>
+    </div>
+</div>
+
+<script>
+let farmerToDelete = null;
+
+function confirmDelete(farmerName, farmerId) {
+    farmerToDelete = farmerId;
+    document.getElementById('farmerName').textContent = farmerName;
+    document.getElementById('deleteModal').style.display = 'block';
+}
+
+function closeDeleteModal() {
+    document.getElementById('deleteModal').style.display = 'none';
+    farmerToDelete = null;
+}
+
+function deleteFarmer() {
+    if (farmerToDelete) {
+        const form = document.getElementById('deleteForm');
+        form.action = `/deletefarmer/${farmerToDelete}/`;
+        form.submit();
+    }
+}
+
+// Close modal when clicking outside
+window.onclick = function(event) {
+    const modal = document.getElementById('deleteModal');
+    if (event.target === modal) {
+        closeDeleteModal();
+    }
+}
+</script>
+
+<style>
+.modal {
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 0;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.modal-header {
+    padding: 20px;
+    border-bottom: 1px solid #dee2e6;
+    background-color: #f8f9fa;
+    border-radius: 10px 10px 0 0;
+}
+
+.modal-header h3 {
+    margin: 0;
+    color: #dc3545;
+}
+
+.modal-body {
+    padding: 20px;
+}
+
+.modal-footer {
+    padding: 20px;
+    border-top: 1px solid #dee2e6;
+    text-align: right;
+}
+
+.modal-footer .btn {
+    margin-left: 10px;
+}
+</style>
+{% endblock %}

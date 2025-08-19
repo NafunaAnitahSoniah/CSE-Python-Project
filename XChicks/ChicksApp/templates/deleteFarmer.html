@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delete Farmer | Young4ChickS</title>
+    <link rel="stylesheet" href="/static/css/design.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head>
+
+<body>
+    <div class="container">
+        <header class="page-header">
+            <h1>Delete Farmer</h1>
+        </header>
+
+        <section class="card">
+            <p>Are you sure you want to delete farmer <strong>{{ farmer.farmer_name }} (ID: {{ farmer.farmer_id
+                    }})</strong>?</p>
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">Confirm Delete</button>
+                <a href="{% url 'salesagentfarmers' %}" class="btn btn-outline">Cancel</a>
+            </form>
+        </section>
+    </div>
+</body>
+
+</html>
